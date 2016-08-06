@@ -9,7 +9,7 @@ cp ../.env.scotchbox .env
 php artisan key:generate > /dev/null
 
 #echo "Installing dependencies with npm..."
-sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share} > /dev/null
+#sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share} > /dev/null
 #npm upgrade -g npm
-npm install
+#npm install
 
