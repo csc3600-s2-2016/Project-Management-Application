@@ -1,2 +1,0 @@
-#!/bin/bash
-tr -d '\r' < /var/www/setup.main.script > ~/temp &&  /bin/bash ~/temp && rm ~/temp
