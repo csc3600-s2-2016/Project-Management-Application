@@ -1,6 +1,11 @@
 # Project-Management-Application
 
 
+<a href="https://zenhub.com">
+  <img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png">
+</a>
+Click the Zenhub badge to add the Zenhub Integration to this github repo for yourself so you can see all of the issues organised fancily on a Kan Ban board
+
 CSC3600 Project Summary
 -----------------------
 Create a web application using the LAMP platform that allows users to create a project description, log time expended, and produce reports.
