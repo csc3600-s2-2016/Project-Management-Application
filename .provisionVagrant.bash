@@ -5,7 +5,11 @@ cd /var/www/taskmanager
 composer install
 
 echo "Creating .env..."
-cp ../.env.scotchbox .env
+sudo cp ../.env.scotchbox .env
+sudo cp ../scotchbox.local.conf /etc/apache2/sites-available/
+sudo a2ensite scotchbox.local.conf
+sudo service apache2 restart
+
 php artisan key:generate > /dev/null
 
 echo "Installing dependencies with npm..."
