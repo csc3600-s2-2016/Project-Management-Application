@@ -14,6 +14,12 @@ php artisan key:generate > /dev/null
 
 echo "Installing dependencies with npm..."
 sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share} > /dev/null
-sudo npm install -g npm # Update npm to the latest version
+#Upgrade to latest npm
+sudo npm install -g npm
+#Upgrade to latest node
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+
 sudo npm install #install required node modules / packages
 

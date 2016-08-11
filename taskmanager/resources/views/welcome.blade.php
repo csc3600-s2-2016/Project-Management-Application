@@ -8,4 +8,5 @@
                 <div class="title">Laravel 5</div>
             </div>
         </div>
+        <script src="/js/main.js"></script>
 @stop
