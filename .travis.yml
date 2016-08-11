@@ -4,11 +4,13 @@ php:
     - 5.6
 
 before_script:
-    - cp .env.travis /taskmanager/.env
+    - cp .env.travis taskmanager/.env
     - mysql -e 'create database homestead_test;'
+    - cd taskmanager
     - composer self-update
     - composer install --no-interaction
     - npm install
+    - cd ..
 
 script:
     - taskmanager/vendor/bin/phpunit
