@@ -1,3 +1,9 @@
 .DS_STORE
 .vagrant
 .box
+/taskmanager/node_modules/*
+/taskmanager/public
+/nbproject/private/
+/nbproject
+csc3600.box
+/taskmanager/npm-debug.log*
