@@ -4,6 +4,7 @@
 <a href="https://zenhub.com">
   <img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png">
 </a>
+<img src="https://travis-ci.org/csc3600-s2-2016/Project-Management-Application.svg?branch=master">
 Click the Zenhub badge to add the Zenhub Integration to this github repo for yourself so you can see all of the issues organised fancily on a Kan Ban board
 
 CSC3600 Project Summary
