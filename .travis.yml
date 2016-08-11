@@ -1,16 +1,21 @@
 language: php
-
 php:
-    - 5.6
-
+- 5.6
 before_script:
-    - cp .env.travis taskmanager/.env
-    - mysql -e 'create database homestead_test;'
-    - cd taskmanager
-    - composer self-update
-    - composer install --no-interaction
-    - npm install
-    - cd ..
-
+- cp .env.travis taskmanager/.env
+- mysql -e 'create database homestead_test;'
+- cd taskmanager
+- composer self-update
+- sudo npm
+- composer install --no-interaction
+- npm install -g npm
+- npm cache clean -f
+- npm install -g n
+- n stable
+- npm install
+- cd ..
 script:
-    - taskmanager/vendor/bin/phpunit
+- taskmanager/vendor/bin/phpunit
+notifications:
+  slack:
+    secure: eHZU+SE4LSkrJQRm8VKhmcDpmIxnjt8/PNfhPCvsEn3lt0sn0yc1NQjxxoyB5FTWTNxTCQLLEaAjn9nx2jCKXwqBvrCdMb61Q8zpVz+iIFCOkgJ8SzMOUdVyNgFJadDJcFmsQp+sJgYO7NPc7wHmeqcp9jPs/IlrI/eqgrs7eqNB9+PW+eDJgWlgMnoY+ga7/StjWjJFQstPJLogK8gxK6qsqU2gpgf6kNoHv2SYnoA6T7Q2KAM9nIEc/NzyggAjSaBNVB1GV4vTe+JKi9uZsubsY7qrk1OHw1ExUCYRJPacwQcUUD+CSk1tv64Qm4hxtVtJE2iCrvFweaG8yYHiyHfx+XDLeKL/AbM/7xVebstT8Rit17NbYqsRhMOyE6rdI4HWNE804fzP3GKpOh/nmq0s3fSNhwh4Rd6n1nZXnuIZTflyOL6ZOL+dJSpb8Ms7GpHrJcYPXVNMsYe21QSgo1JWpqg3tZ+YgXVId32ExbvG0wHYkVgtoUAYiJWfDSE4fTiKoRMFkNuXCLs/R8G5CPbaY2lqEHmRD39oxf1vATLnQ0MgVcALQnfy30EOiNEnFhWeYWuExKrvo4ZC4RUc/sf5COs9nYZ/XS1yYkMVf2RM6HR/RcKYyWINKtX43mNAN/3M60R+nRAwPgQJBhMleXm8EG1/2MBFCzgs6B9fQms=
