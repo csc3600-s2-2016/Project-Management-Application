@@ -18,3 +18,6 @@ elixir(function(mix) {
 elixir(function(mix) {
     mix.browserify('main.js');
 });
+elixir(function(mix){
+    mix.browserify('headernav.js');
+});
