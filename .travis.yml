@@ -6,7 +6,6 @@ before_script:
 - mysql -e 'create database homestead_test;'
 - cd taskmanager
 - composer self-update
-- sudo npm
 - composer install --no-interaction
 - npm install -g npm
 - npm cache clean -f
