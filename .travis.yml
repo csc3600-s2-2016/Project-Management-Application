@@ -9,9 +9,9 @@ before_script:
 - composer install --no-interaction
 - npm install -g npm
 - npm cache clean -f
-- npm install -g n
-- n stable
-- npm install
+- sudo npm install -g n
+- sudo n stable
+- sudo npm install
 - cd ..
 script:
 - taskmanager/vendor/bin/phpunit
