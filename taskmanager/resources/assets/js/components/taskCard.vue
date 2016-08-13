@@ -15,7 +15,7 @@
     border-top: 0;
 }
 .subtaskList   li:hover {
-    background-color: $table-bg-hover;
+    background-color: #EEE;
 }
 
 </style>

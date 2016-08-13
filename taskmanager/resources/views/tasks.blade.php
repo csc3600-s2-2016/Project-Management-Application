@@ -12,7 +12,7 @@
 			<div class="panel-body">
 
 
-				<task-card></task-card>
+				<task-card></task-card><task-card></task-card><task-card></task-card>
 
 			</div>
 		</div>
@@ -25,7 +25,9 @@
 				</div>
 			</div>
 			<div class="panel-body">
-				some stuff
+				
+<task-card></task-card><task-card></task-card>
+
 			</div>
 		</div>
 	</div>
@@ -37,7 +39,9 @@
 				</div>
 			</div>
 			<div class="panel-body">
-				some stuff
+				
+				<task-card></task-card><task-card></task-card><task-card></task-card><task-card></task-card><task-card></task-card>
+				
 			</div>
 		</div>
 	</div>
