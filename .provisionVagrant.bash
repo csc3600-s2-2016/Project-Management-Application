@@ -13,13 +13,13 @@ sudo service apache2 restart
 php artisan key:generate > /dev/null
 
 echo "Installing dependencies with npm..."
-sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share} > /dev/null
+sudo chown -R $(whoami) $(npm config get prefix) > /dev/null
 #Upgrade to latest npm
-sudo npm install -g npm
+npm install -g npm
 #Upgrade to latest node
-sudo npm cache clean -f
-sudo npm install -g n
-sudo n stable
+npm cache clean
+npm install -g n
+n stable
 
-sudo npm install #install required node modules / packages
+npm install #install required node modules / packages
 
