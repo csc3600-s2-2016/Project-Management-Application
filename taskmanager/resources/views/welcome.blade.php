@@ -2,8 +2,6 @@
 
 @section('content')
         <div class="container">
-        	@include('header')
-            <div class="content">
-            </div>
+            {{ config('app.name') }}
         </div>
 @stop

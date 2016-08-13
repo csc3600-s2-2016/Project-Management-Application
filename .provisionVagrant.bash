@@ -23,3 +23,10 @@ n stable
 
 npm install #install required node modules / packages
 
+#install additional packages required for project
+npm install vue-resource	
+npm install vue-sortable
+npm install bootstrap-material-design # For android-like bootstrap theme
+
+gulp
+

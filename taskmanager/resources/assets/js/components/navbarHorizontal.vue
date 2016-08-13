@@ -1,7 +1,5 @@
-var Vue = require('vue');
 
-var HorizontalNav = Vue.extend({
-  template: `
+<template>
 <nav class="navbar navbar-default">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -39,13 +37,15 @@ var HorizontalNav = Vue.extend({
         </div><!--/.container-fluid -->
       </nav>
 
-  `,
+</template>
+
+
+<script>
+export default {
   data () {
     return {
       appName: "Task Manager"  
-    };
+    }
   }
-  // options...
-
-})
-Vue.component('horizontalnav', HorizontalNav);
+}
+</script>

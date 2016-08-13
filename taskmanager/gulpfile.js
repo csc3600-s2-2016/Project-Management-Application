@@ -12,12 +12,9 @@ require('laravel-elixir-vueify');
  */
 elixir.config.js.browserify.watchify.options.poll = true;
 elixir(function(mix) {
-    mix.sass('app.scss');
+    mix.sass('app.scss', null, {includePaths: 'node_modules/bootstrap-sass/assets/stylesheets/'});
 });
 
 elixir(function(mix) {
-    mix.browserify('main.js');
-});
-elixir(function(mix){
-    mix.browserify('headernav.js');
+	    mix.browserify('main.js', 'public/js/app.js');
 });

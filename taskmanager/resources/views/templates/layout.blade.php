@@ -8,17 +8,18 @@
     <meta name="description" content="An Online Project Management Application">
     <meta name="author" content="Team FooBar">
     <meta name="keywords" content="Project, Management, Software, Task, App">
-    <link rel="icon" href="/assests/images/favicon.ico">
+    <link rel="icon" href="/favicon.ico">
 
     <title>{{ config('app.name') }}</title>
-    <link href="/assests/css/style.css" rel="stylesheet">
+    <link href="/css/app.css" rel="stylesheet"> 
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
   </head>
 
   <body>
-
+  <navbar-horizontal></navbar-horizontal>
     @yield('content')
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="/assests/js/vendorbundle.js"></script>
+    <script src="/js/app.js"></script>
   </body>
 </html>
