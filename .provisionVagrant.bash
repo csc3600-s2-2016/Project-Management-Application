@@ -12,7 +12,7 @@ sudo service apache2 restart
 
 php artisan key:generate > /dev/null
 
-echo "Installing dependencies with npm..."
+echo "Preparing npm..."
 sudo chown -R $(whoami) $(npm config get prefix) > /dev/null
 #Upgrade to latest npm
 npm install -g npm
@@ -21,12 +21,5 @@ npm cache clean
 npm install -g n
 n stable
 
+echo "Installing dependencies with npm..."
 npm install #install required node modules / packages
-
-#install additional packages required for project
-npm install vue-resource	
-npm install vue-sortable
-npm install bootstrap-material-design # For android-like bootstrap theme
-
-gulp
-
