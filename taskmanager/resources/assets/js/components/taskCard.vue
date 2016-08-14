@@ -17,13 +17,18 @@
 .subtaskList   li:hover {
     background-color: #EEE;
 }
+.taskMenuIcon {
+    padding-right: 10px;
+}
+.task-summary:hover {
+    background-color:  #cce6ff !important;
+}
 
 </style>
 
 <template id="taskCard-template">
 <div class="panel panel-default">
-    <div class="panel-heading">
-
+    <div class="panel-heading task-summary">
         <div class=row>
             <div class='col-xs-10'>
                 <span class="h4"> {{ title }} </span>
@@ -33,11 +38,11 @@
                     <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dLabel">
-                <li><a href="#">Preview</a></li>
-                <li><a href="#">Edit</a></li>
+                <li><a href="#"><i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview</a></li>
+                <li><a href="#"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="#">Mark as in progress</a></li>
-                <li><a href="#">Mark as complete</a></li>
+                <li><a href="#"><i class="fa fa-thumbs-up taskMenuIcon" aria-hidden="true"></i> Mark as in progress</a></li>
+                <li><a href="#"><i class="fa fa-trophy taskMenuIcon" aria-hidden="true"></i> Mark as complete</a></li>
                 
 
                 </ul>
@@ -47,14 +52,22 @@
         <h4>
             <span class="label label-default">Bill</span>
             <span class="label label-default">Matt</span>
+            <a href="#"  style="float:right;"  v-on:click="toggleSubtasks">
+                <span class='badge'>
+                    <i v-bind:class="[ 'fa', showSubtasks ? 'fa-caret-up' : 'fa-caret-down' ]" aria-hidden="true"></i>
+                    4
+                </span>
+            </a>
+
         </h4>
 
 
     </div>
-    <div class="panel-body">
+
+    <div class="panel-body" v-show='showSubtasks'>
         
         
-        <ul class="subtaskList" v-sortable="{animation: 150}">
+        <ul class="subtaskList" v-sortable="{animation: 250}">
             <li>A subtask for the task</li>
             <li>Another subtask right here</li>
             <li>This is yet another subtask</li>
@@ -69,7 +82,13 @@
 export default {
     data () {
         return {
-            title: "Task Title"
+            title: "Task Title",
+            showSubtasks: false,
+        }
+    },
+    methods: {
+        toggleSubtasks: function(){
+            this.showSubtasks = ! this.showSubtasks;
         }
     }
 }
