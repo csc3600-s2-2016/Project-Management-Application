@@ -9,9 +9,8 @@ global.jQuery = require('jquery');
 require('bootstrap');
 
 //Add components
-var TaskCard = require('./components/taskCard.vue');
-var NavbarHorizontal = require('./components/navbarHorizontal.vue');
-
+import TaskCard from './components/taskCard.vue';
+import NavbarHorizontal from './components/navbarHorizontal.vue';
 
 Vue.use(Sortable);
 
