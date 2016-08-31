@@ -2,14 +2,14 @@
 @section('content')
 <div class="container-fluid">
 <div id="taskManagementApp" class="row">
-	<div class="col-md-4">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
+	<div class="col-md-4" style="padding:0px;">
+		<div class="">
+			<div class="task-column-heading-container">
+				<span class="task-column-heading">
 					To Do:
-				</div>
+				</span>
 			</div>
-			<div class="panel-body  task-column" v-sortable="{group :{name:'todos', put:['doings', 'dones']}, animation: '250'}">
+			<div id="first-task-column" class="task-column" v-sortable="{group :{name:'todos', put:['doings', 'dones']}, animation: '250'}">
 
 
 				<task-card></task-card>
@@ -17,29 +17,32 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-4">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
+	<div class="col-md-4" style="padding:0px;">
+		<div class="">
+			<div class="task-column-heading-container">
+				<span class="task-column-heading">
 					In Progress:
-				</div>
+				</span>
 			</div>
-			<div class="panel-body task-column" v-sortable="{group: {name: 'doings', put: ['todos','dones'] }, animation: '250'}">
-				
-				<task-card></task-card><task-card></task-card><task-card></task-card>
+			<div class="task-column" v-sortable="{group :{name:'todos', put:['doings', 'dones']}, animation: '250'}">
+
+
+				<task-card></task-card>
 
 			</div>
 		</div>
 	</div>
-	<div class="col-md-4">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<div class="panel-title">
+	<div class="col-md-4" style="padding:0px;">
+		<div class="">
+			<div class="task-column-heading-container">
+				<span class="task-column-heading">
 					Complete:
-				</div>
+				</span>
 			</div>
-			<div class="panel-body  task-column" v-sortable="{group: {name: 'dones', put: ['todos','doings'] }, animation: '250'}">
-				
+			<div class="task-column" v-sortable="{group :{name:'todos', put:['doings', 'dones']}, animation: '250'}">
+
+
+				<task-card></task-card>
 
 			</div>
 		</div>

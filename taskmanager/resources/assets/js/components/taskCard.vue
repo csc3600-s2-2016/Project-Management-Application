@@ -1,3 +1,15 @@
+
+
+<!-- ==================================================
+    TASK CARD
+    shows summary of task in a card component
+====================================================-->
+
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - 
+                STYLE
+- - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <style>
 .subtaskList {
     list-style: none;
@@ -24,10 +36,22 @@
     background-color:  #cce6ff !important;
 }
 
+.task-panel {
+    max-width: 600px;
+}
+
+@media (min-width: 992px) {
+    .task-panel {
+        max-width: 250px;
+    }
+}
 </style>
 
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - 
+                TEMPLATE
+- - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <template id="taskCard-template">
-<div class="panel panel-default">
+<div class="panel panel-default task-panel">
     <div class="panel-heading task-summary">
         <div class=row>
             <div class='col-xs-10'>
@@ -38,52 +62,73 @@
                     <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dLabel">
-                <li><a href="#"><i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview</a></li>
-                <li><a href="#"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#"><i class="fa fa-thumbs-up taskMenuIcon" aria-hidden="true"></i> Mark as in progress</a></li>
-                <li><a href="#"><i class="fa fa-trophy taskMenuIcon" aria-hidden="true"></i> Mark as complete</a></li>
-                
-
+                    <li><a href="#"><i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview</a></li>
+                    <li><a href="#"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
                 </ul>
             </div>
         </div>
-        <div class="h6"> Due 3/10/16, [30/80hrs] </div> 
+        <div class="h6">
+            <span v-if="dueDate">Due {{ duedate }}</span>
+            <span v-if="hoursEstimated"> [{{ hoursSummary }}] </span>
+        </div> 
+        
         <h4>
-            <span class="label label-default">Bill</span>
-            <span class="label label-default">Matt</span>
+            <span v-for="user in assignedUsers" class="label label-default">user.displayName</span>
             <a href="#"  style="float:right;"  v-on:click="toggleSubtasks">
                 <span class='badge'>
                     <i v-bind:class="[ 'fa', showSubtasks ? 'fa-caret-up' : 'fa-caret-down' ]" aria-hidden="true"></i>
-                    4
+                    {{ subtasks.length }}
                 </span>
             </a>
-
         </h4>
-
 
     </div>
 
     <div class="panel-body" v-show='showSubtasks'>
-        
-        
         <ul class="subtaskList" v-sortable="{animation: 250}">
-            <li>A subtask for the task</li>
-            <li>Another subtask right here</li>
-            <li>This is yet another subtask</li>
-            <li>A task that is part of another task</li>
+            <li v-for="subtask in subtasks">
+                {{ subtask.description }}
+            </li>
         </ul>
-    
     </div>
 </div>
 </template>
 
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - 
+             SCRIPT
+- - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <script>
 export default {
     data () {
         return {
             title: "Task Title",
+            status: 0,
             showSubtasks: false,
+            dueDate: "3/10/16",
+            hoursUtilized: 20,
+            hoursEstimated: 30,
+            assignedUsers: [
+                {displayName: "Bill"},
+                {displayName: "Matt"}
+            ],
+            subtasks: [
+                {description: "Buy milk"},
+                {description: "Build time machine"}
+            ]
+        }
+    },
+    props: {
+
+    },
+    computed: {
+        hoursSummary: function(){
+            this.hoursUtilized   ?   return  this.hoursUtilized + '/' + this.hoursEstimated :  return this.hoursEstimated;
+        },
+        canMarkAs: function(){
+            if (this.status == 1){
+                return 
+            }
         }
     },
     methods: {

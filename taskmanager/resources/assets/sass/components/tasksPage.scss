@@ -3,5 +3,24 @@
 
 
 .task-column {
+	min-height: 1px;
+	padding: 10px;
+	border-right: 1px solid #CCC;
+}
+@media (min-width: 992px) {
+	.task-column {
 	min-height: 80vh;
+	}
+}
+#first-task-column {
+	border-left: 1px solid #CCC;
+}
+.task-column-heading-container{
+	width: 100%;
+	margin: 20px;
+	text-align: center;
+
+}
+.task-column-heading {
+	font-size: 2.5rem;
 }
