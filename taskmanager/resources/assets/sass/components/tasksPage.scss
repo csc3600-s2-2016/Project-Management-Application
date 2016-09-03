@@ -4,7 +4,7 @@
 
 .task-column {
 	min-height: 1px;
-	padding: 10px;
+	padding: 10px 50px;
 	border-right: 1px solid #CCC;
 }
 @media (min-width: 992px) {
@@ -17,10 +17,28 @@
 }
 .task-column-heading-container{
 	width: 100%;
-	margin: 20px;
+	margin: 20px 0;
 	text-align: center;
-
 }
 .task-column-heading {
 	font-size: 2.5rem;
+}
+
+.assignUsersPanel{
+	min-height: 80px;
+}
+.assignUsersPanel:first-of-type{
+    border-right: 1px dotted #555;
+}
+.assignUsersPanel ul {
+    padding: 10px 0;
+}
+.assignUsersPanel ul li {
+    display: inline-block;
+    color: $white;
+    list-style: none;
+    margin: 5px;
+    background-color: $brand-info;
+    padding: 4px 10px;
+    border-radius: 3px;
 }

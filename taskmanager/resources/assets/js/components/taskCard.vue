@@ -32,19 +32,23 @@
 .taskMenuIcon {
     padding-right: 10px;
 }
+.task-summary {
+    background-color: #FFFFFF !important;
+}
 .task-summary:hover {
     background-color:  #cce6ff !important;
 }
 
 .task-panel {
     max-width: 600px;
+    margin: 0 auto 20px auto;
 }
 
-@media (min-width: 992px) {
-    .task-panel {
-        max-width: 250px;
-    }
+.name-label {
+    display: inline-block !important;
+    margin: 7px 7px 0 0;
 }
+
 </style>
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -68,12 +72,12 @@
             </div>
         </div>
         <div class="h6">
-            <span v-if="dueDate">Due {{ duedate }}</span>
+            <span v-if="dueDate">Due {{ dueDate }}</span>
             <span v-if="hoursEstimated"> [{{ hoursSummary }}] </span>
         </div> 
         
         <h4>
-            <span v-for="user in assignedUsers" class="label label-default">user.displayName</span>
+            <div v-for="user in assignedUsers" class="label label-default name-label">{{user.displayName}}</div>
             <a href="#"  style="float:right;"  v-on:click="toggleSubtasks">
                 <span class='badge'>
                     <i v-bind:class="[ 'fa', showSubtasks ? 'fa-caret-up' : 'fa-caret-down' ]" aria-hidden="true"></i>
@@ -123,7 +127,11 @@ export default {
     },
     computed: {
         hoursSummary: function(){
-            this.hoursUtilized   ?   return  this.hoursUtilized + '/' + this.hoursEstimated :  return this.hoursEstimated;
+            if (this.hoursUtilized){
+                return  this.hoursUtilized + '/' + this.hoursEstimated;
+                }else {
+                    return this.hoursEstimated;
+                }  
         },
         canMarkAs: function(){
             if (this.status == 1){

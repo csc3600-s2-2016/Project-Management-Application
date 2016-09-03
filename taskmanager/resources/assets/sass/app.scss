@@ -1,6 +1,14 @@
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap.scss";
-@import "node_modules/bootstrap-material-design/sass/bootstrap-material-design.scss";
-@import "fontawesome/font-awesome.scss";
-@import "components/tasksPage.scss"
+@import "variables";
+@import "node_modules/bootstrap-material-design/sass/bootstrap-material-design";
+@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "node_modules/bootstrap-material-design/sass/bootstrap-material-design";
+@import 'node_modules/flatpickr/dist/flatpickr.min';
+@import "fontawesome/font-awesome";
+@import "components/tasksPage";
+@import "components/welcomePage";
 
+// - - - - - - - - - - - - - - - - - - - - - - - - 
+body {
+	background: #EEEEEE;
+}
 
