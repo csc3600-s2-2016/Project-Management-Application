@@ -34,6 +34,7 @@
 }
 .task-summary {
     background-color: #FFFFFF !important;
+    min-height: 110px;
 }
 .task-summary:hover {
     background-color:  #cce6ff !important;
@@ -55,33 +56,39 @@
                 TEMPLATE
 - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <template id="taskCard-template">
+<div>
+<view-task-modal :id="randomIdentifier" :title="task.name" :assigned-users="task.assignedUsers" :subtasks="task.subtasks" :description="task.description" :time-logged="task.hoursUtilized" :time-estimated="task.hoursEstimated" :due-date="task.dueDate"></view-task-modal>
 <div class="panel panel-default task-panel">
     <div class="panel-heading task-summary">
         <div class=row>
             <div class='col-xs-10'>
-                <span class="h4"> {{ title }} </span>
+                <span class="h4"> {{ task.name }} </span>
             </div>
             <div class='col-xs-2 text-right'>
                 <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dLabel">
-                    <li><a href="#"><i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview</a></li>
+                    <li>
+                        <a data-toggle="modal" data-target="{{'#' + randomIdentifier}}">
+                            <i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview
+                        </a>
+                    </li>
                     <li><a href="#"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
                 </ul>
             </div>
         </div>
         <div class="h6">
-            <span v-if="dueDate">Due {{ dueDate }}</span>
-            <span v-if="hoursEstimated"> [{{ hoursSummary }}] </span>
+            <span v-if="task.dueDate">Due {{ task.dueDate }}</span>
+            <span v-if="task.timeEstimated"> [{{ timeSummary }}] </span>
         </div> 
         
         <h4>
-            <div v-for="user in assignedUsers" class="label label-default name-label">{{user.displayName}}</div>
-            <a href="#"  style="float:right;"  v-on:click="toggleSubtasks">
+            <div v-for="user in task.assignedUsers" class="label label-default name-label">{{user.displayName}}</div>
+            <a href="#"  style="float:right;"  v-on:click="toggleSubtasks" v-if="task.subtasks">
                 <span class='badge'>
                     <i v-bind:class="[ 'fa', showSubtasks ? 'fa-caret-up' : 'fa-caret-down' ]" aria-hidden="true"></i>
-                    {{ subtasks.length }}
+                    {{ task.subtasks.length }}
                 </span>
             </a>
         </h4>
@@ -90,11 +97,12 @@
 
     <div class="panel-body" v-show='showSubtasks'>
         <ul class="subtaskList" v-sortable="{animation: 250}">
-            <li v-for="subtask in subtasks">
+            <li v-for="subtask in task.subtasks">
                 {{ subtask.description }}
             </li>
         </ul>
     </div>
+</div>
 </div>
 </template>
 
@@ -103,46 +111,46 @@
              SCRIPT
 - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <script>
+import ViewTaskModal from './viewTaskModal.vue';
 export default {
     data () {
         return {
-            title: "Task Title",
-            status: 0,
             showSubtasks: false,
-            dueDate: "3/10/16",
-            hoursUtilized: 20,
-            hoursEstimated: 30,
-            assignedUsers: [
-                {displayName: "Bill"},
-                {displayName: "Matt"}
-            ],
-            subtasks: [
-                {description: "Buy milk"},
-                {description: "Build time machine"}
-            ]
         }
     },
-    props: {
-
-    },
+    props: [
+        "task"
+    ],
     computed: {
-        hoursSummary: function(){
-            if (this.hoursUtilized){
-                return  this.hoursUtilized + '/' + this.hoursEstimated;
-                }else {
-                    return this.hoursEstimated;
-                }  
+        timeSummary: function(){
+            if (this.task.timeLogged){
+                return  this.task.timeLogged + '/' + this.task.timeEstimated;
+            }else {
+                return this.task.timeEstimated;
+            }  
         },
         canMarkAs: function(){
             if (this.status == 1){
                 return 
             }
+        },
+        randomIdentifier: function(){
+            var identifierLength = 16;
+            var identifier = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            for(var i = 0; i < identifierLength; i++) {
+                identifier += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return identifier;
         }
     },
     methods: {
         toggleSubtasks: function(){
             this.showSubtasks = ! this.showSubtasks;
         }
+    },
+    components: {
+        viewTaskModal: ViewTaskModal
     }
 }
 </script>

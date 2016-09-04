@@ -20,7 +20,7 @@
                     <input v-model="dueDate" type="text" disabled="disabled" id="addon1" class="form-control" placeholder="No Due Date">
                 </div>
                 <div class="input-group-addon">
-                    <span class="btn btn-primary btn-xs btn-raised" v-on:click="dueDate=''" data-toggle="tooltip" data-placement="bottom" title="Remove due date from task">X</span>
+                    <span class="btn btn-primary btn-xs btn-raised" v-on:click="dueDate='' " data-toggle="tooltip" data-placement="bottom" title="Remove due date from task">&times;</span>
                 </div>
             </div>
           

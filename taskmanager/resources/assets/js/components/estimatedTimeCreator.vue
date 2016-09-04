@@ -24,7 +24,7 @@
                     <input v-model="estimatedTime" type="number" min='0' step='1' id="addon1" class="form-control" placeholder="No estimated time">
                 
                 <div class="input-group-addon">
-                    <span class="btn btn-primary btn-xs btn-raised" v-on:click="estimatedTime = 0" data-toggle="tooltip" data-placement="bottom" title="Remove time estimation from task">X</span>
+                    <span class="btn btn-primary btn-xs btn-raised" v-on:click="estimatedTime = 0" data-toggle="tooltip" data-placement="bottom" title="Remove time estimation from task">&times;</span>
                 </div>
             </div>
             

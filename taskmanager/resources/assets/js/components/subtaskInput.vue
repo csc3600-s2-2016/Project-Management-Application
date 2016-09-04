@@ -3,7 +3,7 @@
             <div class="input-group">
                 <input v-model="subtaskName" type="text" class="form-control" placeholder="Subtask description">
                 <div class="input-group-addon">
-                    <span class="btn btn-primary btn-xs btn-raised" v-on:click="removeSubtask" data-toggle="tooltip" data-placement="bottom" title="Remove subtask">X</span>
+                    <span class="btn btn-primary btn-xs btn-raised" v-on:click="removeSubtask" data-toggle="tooltip" data-placement="bottom" title="Remove subtask">&times;</span>
                 </div>
             </div>
         </div>

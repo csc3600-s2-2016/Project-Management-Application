@@ -1,10 +1,14 @@
 
 
 
-
+#app{
+	margin-top:50px;
+}
+.task-col-container{
+	padding: 0px !important;
+}
 .task-column {
 	min-height: 1px;
-	padding: 10px 50px;
 	border-right: 1px solid #CCC;
 }
 @media (min-width: 992px) {

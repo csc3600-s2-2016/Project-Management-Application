@@ -1,8 +1,10 @@
 .DS_STORE
 .vagrant
 .box
+.idea
 /taskmanager/node_modules/*
-/taskmanager/public
+/taskmanager/public/css
+/taskmanager/public/js
 /nbproject/private/
 /nbproject
 csc3600.box

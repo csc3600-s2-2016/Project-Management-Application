@@ -11,11 +11,10 @@ require('bootstrap');
 var material = require('bootstrap-material-design');
 
 //Add components
-import TaskCard from './components/taskCard.vue';
-import DuedateCreator from './components/duedateCreator.vue';
-import EstimatedTimeCreator from './components/estimatedTimeCreator.vue';
-import AssignUsers from './components/AssignUsers.vue';
-import CreateSubtasks from './components/createSubtasks.vue';
+
+import TaskManagementApp from './components/taskManagementApp.vue';
+
+
 
 
 Vue.use(Sortable);
@@ -29,10 +28,6 @@ new Vue({
 	});
   },
   components: { 
-  	taskCard: TaskCard,
-  	assignUsers: AssignUsers,
-  	duedatecreator: DuedateCreator,
-  	estimatedTimeCreator: EstimatedTimeCreator,
-  	createSubtasks: CreateSubtasks
+  	taskManagementApp: TaskManagementApp
   }
 });
