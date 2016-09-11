@@ -1,42 +1,146 @@
+<style>
+  .taskTimeLoggedTable {
+    width: 80%;
+    margin: auto;
+  }
+  .taskTimeLoggedTable td {
+    width: 50%;
+  }
+  .taskTimeLoggedTable td:nth-child(2) {
+    text-align: right;
+  }
+  .checkbox-small{
+    transform: scale(0.75,0.75);
+  }
+</style>
 <template>
+
 	<div class="modal fade" id="{{id}}" tabindex="-1" >
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog" :class="modalSize" role="document">
     <div class="modal-content">
       
 
       <div class="modal-header">
+        
+        
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <span class="h3 modal-title">{{title}}</span><hr />
+        <div class="row">
+          <div class="col-sm-8">
+            <span class="h3 modal-title">{{task.name}}</span>
+          </div>
+          
+        </div>
       </div>
 
 
     <div class="modal-body">  
-      <section v-show="description">
-        <span class="h3">Task Description:</span>
-        <h5>{{description}}</h5>
-      </section>
-      <div class="row">
-        <div class="col-sm-4" v-show="assignedUsers">
-            <h3 ><span v-for="user in assignedUsers" class="label label-primary">{{user.displayName}}</span></h3>
-        </div>
-        <div class="col-sm-4" v-show="dueDate">
-          <h3>Due date: {{dueDate}}
-        </div>
-        <div class="col-sm-4" v-show="timeLogged || timeEstimated">
-          <h3 v-show="timeLogged">Time logged: {{timeLogged}}</h3>
-          <h3 v-show="timeEstimated">Time estimated: {{timeEstimated}}</h3>
-        </div>
-      </div>
-      <div>
-        <ul class="subtaskList" v-sortable="{animation: 250}">
-            <li v-for="subtask in task.subtasks">
-                {{ subtask.description }}
-            </li>
-        </ul>
-      </div>
+    <div class="row">
 
+
+
+    <section class="col-md-8" v-show="task.description || task.subtasks">
+      <div v-show="task.description">
+        <h5>{{task.description}}</h5>
+      </div><br />
+
+      <div>
+      <br />
+      
+
+
+
+      <div class="h4" v-show="task.subtasks">Subtasks:</div>
+        <table style="width:100%;">
+        <tbody v-sortable="subtaskSortableOptions">
+          <tr v-for="subtask in task.subtasks" >
+            <td style="width:30px;">
+                <div class="checkbox checkbox-small">
+                  <label>
+                    <input type="checkbox" v-model="subtask.complete">
+                  </label>
+                </div>
+            </td>
+            <td>
+                {{ subtask.description }}
+            </td>
+            <td v-show="task.subtasks.length > 1" class="sort-handle text-right" style="width:20px;">
+              <span class="fa fa-sort"></span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+    </section>
+
+
+
+
+    <section class="{{ modalIsLarge ? 'col-md-4' : 'col-md-12' }}" :style=" modalIsLarge ? 'border-left:1px solid #ddd;' : '' ">
+       
+          <table class="taskTimeLoggedTable" v-show="task.dueDate || task.timeLogged || task.timeEstimated" style="max-width:200px;">
+            <tr v-show="task.dueDate">
+              <td><span class="h5">Due:</span></td>
+              <td><span class="h3">  {{task.dueDate}}</span></td>
+          </div>
+              <td></td>
+            </tr>
+            <tr v-show="task.timeLogged">
+              <td><span class="h5" v-show="task.timeLogged">Logged:</span></td>
+              <td><span class="h3">{{task.timeLogged}}</span></td>
+            </tr>
+            <tr v-show="task.timeEstimated">
+              <td><span class="h5"  v-show="task.timeEstimated">Estimate: </span></td>
+              <td><span class="h3">{{task.timeEstimated}}</span></td>
+            </tr>
+          </table>
+          <br /><br />
+          
+
+
+
+
+          <div v-show="task.assignedUsers" class="text-center" style="margin-top:10px;">
+            <h3 ><span v-for="userID in task.assignedUsers" class="label label-username">{{users[userID].displayName}}</span></h3>
+          </div>
+
+          <div class="text-center" style="margin-top:30px;">
+            <a v-on:click="showLogTimeModal">
+              <button class="btn btn-primary btn-raised"><span class="fa fa-clock-o"></span> Log Time</button>
+            </a>
+          </div>
+
+
+
+    </section>
+
+    
+  </div>
+  
+  <section v-show="task.loggedTimeHistory">
+  <br /><hr />
+      <table style="width:100%;" class="table table-striped table-hover timeLoggedTable">
+        <thead>
+          <tr>
+            <th>Start Date</th>
+            <th>Start Time</th>
+            <th>Time Logged</th>
+            <th>Team Member</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="log in task.loggedTimeHistory">
+            <td>{{log.startTime}}</td>
+            <td>{{log.startDate}}</td>
+            <td>{{log.timeLogged}}</td>
+            <td>{{log.user}}</td>
+            <td>{{log.notes}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <hr />
+    </section>
 
     </div>
   </div>
@@ -47,17 +151,39 @@
 export default {
     data () {
         return {
+          subtaskSortableOptions: {
+            animation: 250,
+            handle: ".sort-handle",
+            ghostClass: "ghostclass"
+          }
         }
     },
     props: [
-    	"title",
-    	"assignedUsers",
-    	"subtasks",
-    	"description",
-    	"timeLogged",
-    	"timeEstimated",
-    	"dueDate",
-    	"id"
-    ]
+      "task",
+    	"id",
+      "users",
+      "logTimeId"
+    ],
+    computed: {
+      modalSize: function(){
+        if (this.task.description || this.task.subtasks){
+          return "modal-lg";
+        }
+        return "";
+      },
+      modalIsLarge: function(){
+        return this.modalSize ? true : false;
+      }
+    },
+    methods: {
+      showLogTimeModal: function(){
+        this.$dispatch('logTimeOpenedFromTaskModal', true);
+        jQuery("#" + this.id).modal('hide');
+        jQuery('#' + this.logTimeId).modal('show');
+      }
+    },
+    ready: function(){
+      jQuery.material.checkbox();
+    }
 }
 </script>

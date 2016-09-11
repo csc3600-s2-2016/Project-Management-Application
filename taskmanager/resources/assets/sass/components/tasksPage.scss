@@ -4,6 +4,12 @@
 #app{
 	margin-top:50px;
 }
+.label-username{
+	@extend .label-info;
+	font-weight: 200;
+	display: inline-block !important;
+    margin: 7px 7px 0 0;
+}
 .task-col-container{
 	padding: 0px !important;
 }
@@ -23,26 +29,64 @@
 	width: 100%;
 	margin: 20px 0;
 	text-align: center;
-}
-.task-column-heading {
-	font-size: 2.5rem;
+
 }
 
+.timeLoggedTable{
+	@extend p;
+}
 .assignUsersPanel{
 	min-height: 80px;
+	width: 100%;
+	vertical-align: top;
+	border-collapse: separate;
+	border-spacing: 0px;
+	.right-border-this{
+		border-right: 1px solid #CCC;
+	}
+	td{
+		width: 1%;
+		padding: 10px 0;
+	}
+	td:first-child, td:last-child{
+		width: 49%;
+		vertical-align: top;
+
+		div{
+			display: inline-block;
+		    color: $white;
+		    margin: 5px;
+		    background-color: $brand-info;
+		    padding: 4px 10px;
+		    border-radius: 3px;
+		    cursor: move; /* fallback if grab cursor is unsupported */
+		    cursor: grab;
+		    cursor: -moz-grab;
+		    cursor: -webkit-grab;
+		}
+		div:active { 
+		    cursor: grabbing;
+		    cursor: -moz-grabbing;
+		    cursor: -webkit-grabbing;
+		}
+		
+	}
 }
-.assignUsersPanel:first-of-type{
-    border-right: 1px dotted #555;
+.draggingCursor {
+	cursor: grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
 }
-.assignUsersPanel ul {
-    padding: 10px 0;
+.dragToHereClass{
+		    border-radius: 20px;
+		    background-clip: padding-box;
+		    border: 1px dashed $brand-primary;
+		    background-color: $green-50;
+		}
+.notDraggingClass{
+	border: 1px solid $white;
 }
-.assignUsersPanel ul li {
-    display: inline-block;
-    color: $white;
-    list-style: none;
-    margin: 5px;
-    background-color: $brand-info;
-    padding: 4px 10px;
-    border-radius: 3px;
+.ghostclass{
+	border: 1px solid $brand-primary;
+    background-color: $green-50;
 }

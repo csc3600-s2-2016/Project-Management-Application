@@ -3,6 +3,7 @@
 //add libraries
 var Vue = require('vue');
 var Sortable = require('vue-sortable');
+var VDragableFor = require('vuedragablefor');
 require('vue-resource');
 require('vue-sortable');
 global.jQuery = require('jquery');
@@ -13,13 +14,16 @@ var material = require('bootstrap-material-design');
 //Add components
 
 import TaskManagementApp from './components/taskManagementApp.vue';
+import DatePicker from './components/datepicker.vue';
 
 
 
 
 Vue.use(Sortable);
+Vue.use(VDragableFor);
+Vue.component("datePicker", DatePicker);
 
-new Vue({
+var taskApp = new Vue({
   el: 'body',
   ready: function(){
   	jQuery.material.init();

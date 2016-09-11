@@ -7,7 +7,7 @@
 		</div>
 		<div class="task-column" :style="colPadding" v-sortable="sortableOptions">
 
-				<task-card v-for="task in tasks | filterBy colID in 'status'" :task.sync="task" ></task-card>
+				<task-card v-for="task in tasks | filterBy colID in 'status'" :task.sync="task" :users="users" :current-user="currentUser"></task-card>
 
 		</div>
 	</div>
@@ -19,7 +19,9 @@ export default {
 	props: [
 		"name",
 		"colNames",
-		"tasks"
+		"tasks",
+        "users",
+        "currentUser"
 	],
 	data () {
         return {

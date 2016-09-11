@@ -1,10 +1,12 @@
 <template>
-	<new-task-modal></new-task-modal>
+<div>
+	<new-task-modal :users="users"></new-task-modal>
     <div :style="container">
         <div id="taskManagementApp" class="row">
-            <task-column v-for="category in categories" :name.sync="category" :col-names.sync="categories" :tasks.sync="tasks"></task-column>
+            <task-column v-for="category in categories" :name.sync="category" :col-names.sync="categories" :tasks.sync="tasks" :users="users" :current-user="currentUser"></task-column>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -14,40 +16,42 @@ export default {
     data () {
         return {
             categories: [
-                "To Do", "In Progress", "Completed"
+                "To Do", "In Progress", "Completed", "Too Hard Basket"
             ],
         	tasks: [
         		{
         			name:"Some Task",
         			description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel quisquam odio, voluptates ipsa iure, recusandae aliquam!",
                     assignedUsers: [
-                        {displayName:"John"},
-                        {displayName:"Antonio"}
+                        "u1", "u4", "u6"
                     ],
                     dueDate: "24-05-16",
                     timeLogged: "4",
                     timeEstimated: "20",
                     subtasks: [
-                        {description: "Lorem ipsum dolor sit amet."},
-                        {description: "Consectetur adipisicing elit. Aliquam, quia."},
-                        {description: "Lorem ipsum dolor sit amet, consectetur adipisicing."}
+                        {description: "Lorem ipsum dolor sit amet.", complete: false},
+                        {description: "Consectetur adipisicing elit. Aliquam, quia.", complete: true},
+                        {description: "Lorem ipsum dolor sit amet, consectetur adipisicing.", complete: true}
                     ],
-                    status: 0
+                    status: 0,
+                    loggedTimeHistory: [
+                        {startDate: "11-06-2016", startTime: "15:03", timeLogged: "4", user:"Matt", notes:"I hated this task!"},
+                        {startDate: "11-06-2016", startTime: "15:42", timeLogged: "6", user:"Tony", notes:"I Loved this task!"},
+                        {startDate: "11-06-2016", startTime: "15:03", timeLogged: "4", user:"Matt", notes:"I hated this task!"},
+                        {startDate: "11-06-2016", startTime: "15:42", timeLogged: "6", user:"Tony", notes:"I Loved this task!"}
+                    ]
         		},
                 {
                     name:"Find the one armed, one eyed, one legged man!",
                     description: "Placeat amet vitae eos expedita rem labore! Magni, quaerat incidunt. Perferendis architecto, id vitae omnis sit libero, voluptate qui voluptas similique accusantium!",
                     assignedUsers: [
-                        {displayName:"John"},
-                        {displayName:"Antonio"}
+                        "u4", "u5"
                     ],
                     dueDate: "24-05-16",
                     timeLogged: "4",
                     timeEstimated: "20",
                     subtasks: [
-                        {description: "Maxime, harum!"},
-                        {description: "Aliquam, quia."},
-                        {description: "Consectetur adipisicing."}
+                        {description: "Maxime, harum!", complete: false}
                     ],
                     status: 1
                 },
@@ -55,17 +59,14 @@ export default {
                     name:"Finish coding these components",
                     description: "Placeat amet vitae eos expedita rem labore! Magni, quaerat incidunt. Perferendis architecto, id vitae omnis sit libero, voluptate qui voluptas similique accusantium!",
                     assignedUsers: [
-                        {displayName:"John"},
-                        {displayName:"Sarah"},
-                        {displayName:"Prof.Smith"},
-                        {displayName:"Antonio"}
+                        "u2"
                     ],
                     dueDate: "24-05-16",
                     timeLogged: "4",
                     timeEstimated: "20",
                     subtasks: [
-                        {description: "Code this"},
-                        {description: "Code that"}
+                        {description: "Code this", complete: false},
+                        {description: "Code that", complete: false}
                     ],
                     status: 2
                 },
@@ -77,12 +78,20 @@ export default {
                 {
                     name:"Watch game of thrones",
                     assignedUsers: [
-                        {displayName:"Hiroshi"},
-                        {displayName:"BoatyMcBoat"}
+                        "u6", "u5", "u1", "u3"
                     ],
                     status: 3
                 }
-        	]
+        	],
+            users: {
+                u1: {id: "u1", displayName:"John"},
+                u2: {id: "u2", displayName:"Sarah"},
+                u3: {id: "u3", displayName:"Tony"},
+                u4: {id: "u4", displayName:"Jill"},
+                u5: {id: "u5", displayName:"Anontio"},
+                u6: {id: "u6", displayName:"Emma"}
+            },
+            currentUser: "u5"
         }
     },
     computed:{
@@ -97,6 +106,12 @@ export default {
     components: {
     	newTaskModal: NewTaskModal,
         taskColumn: TaskColumn
+    },
+    events: {
+        'newTask': function(newTask){
+            newTask.status = 0;
+            this.tasks.push(newTask);
+        }
     }
 }
 </script>

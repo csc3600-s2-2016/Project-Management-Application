@@ -2,7 +2,7 @@
 
 @section('content')
 
-<body>
+<div class="welcomPage">
     <!-- Header -->
     <a name="about"></a>
     <div class="intro-header">
@@ -157,5 +157,5 @@
             </div>
         </div>
     </footer>
-    
+</div>
 @stop

@@ -1,15 +1,7 @@
 <template>
 
-            
+        <div>
             <input v-el:flatpickr type="hidden">
-           <!--  <div class="row">
-                <div class="col-sm-5">
-                <h4>Due Date</h4>
-                </div>
-                <div class="col-sm-5">
-                <input type="text" name="dueDate" class="form-control" v-model="dueDate">
-                </div>
-            </div> -->
 
             
             <br />
@@ -23,7 +15,7 @@
                     <span class="btn btn-primary btn-xs btn-raised" v-on:click="dueDate='' " data-toggle="tooltip" data-placement="bottom" title="Remove due date from task">&times;</span>
                 </div>
             </div>
-          
+          </div>
 
 </template>
 
@@ -31,9 +23,9 @@
     import flatpickr from 'flatpickr';
 
     export default {
-        props: {
-            
-        },
+        props: [
+            "dueDate"
+        ],
 
         ready() {
             var self = this;
@@ -53,8 +45,7 @@
 
         data() {
             return {
-                flatpickr: null,
-                dueDate: ""
+                flatpickr: null
             }
         },
 
