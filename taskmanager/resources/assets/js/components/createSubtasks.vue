@@ -60,6 +60,25 @@ export default {
             this.subtasks = subtasks;
 
         }
+     },
+     events: {
+        'savingTask': function(removeEmptySubtasks){
+            if (!this.subtasks){
+                return;
+            }
+
+            var subtasks = new Array();
+            var priority = 0;
+            for (var i = 0; i<this.subtasks.length; i++){
+                if (this.subtasks[i].description.trim().length > 0){
+                    subtasks.push( {'priority': priority++, 'description' : this.subtasks[i].description, 'complete': false} );
+                }
+            }
+            if (subtasks.length === 0){
+                subtasks = ''; 
+            }
+            this.subtasks = subtasks;
+        } 
      }
 }
 

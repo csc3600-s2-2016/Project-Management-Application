@@ -8,7 +8,7 @@
 <template id="taskCard-template">
 <div>
 <view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task.sync="task" :users="users"></view-task-modal>
-<log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :current-user="currentUser" :users="users"></log-time>
+<log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :task-time-logged.sync="task.timeLogged" :current-user="currentUser" :users="users"></log-time>
 <div class="panel panel-default task-panel">
     <div class="panel-heading task-summary">
         <div class=row>
@@ -35,8 +35,8 @@
             </div>
         </div>
         <div class="h6">
-            <span v-if="task.dueDate">Due {{ task.dueDate }}</span>
-            <span v-if="task.timeEstimated"> [{{ timeSummary }}] </span>
+            <span v-show="task.dueDate" :class="pastDueDate ? 'text-danger' : ''">Due {{ task.dueDate }}</span>
+            <span v-show="timeSummary" :class="loggedTimeOverBudget ? 'text-danger' : '' "> [{{ timeSummary }}] </span>
         </div> 
         
         <h4>
@@ -45,11 +45,13 @@
                     <td>
                          <div v-for="userID in task.assignedUsers" class="label label-username">{{users[userID].displayName}}</div>
                     </td>
-                    <td v-on:click="toggleSubtasks" v-if="task.subtasks" class="text-right">
+                    <td v-if="task.subtasks" class="text-right">
+                        <a v-on:click="toggleSubtasks" >
                         <span class='badge'>
                             <i v-bind:class="[ 'fa', showSubtasks ? 'fa-caret-up' : 'fa-caret-down' ]" aria-hidden="true"></i>
                             {{ task.subtasks.length }}
                         </span>
+                        </a>
                     </td>
                 </tr>
             </table>
@@ -89,11 +91,23 @@ export default {
     ],
     computed: {
         timeSummary: function(){
+            var summary = '';
             if (this.task.timeLogged){
-                return  this.task.timeLogged + '/' + this.task.timeEstimated;
-            }else {
-                return this.task.timeEstimated;
-            }  
+                summary += this.task.timeLogged + "/";
+            }
+            if (this.task.timeEstimated){
+                summary += this.task.timeEstimated;
+            } else if (this.task.timeLogged){
+                summary += "--";
+            } 
+            return summary;
+
+        },
+        loggedTimeOverBudget : function(){
+            if (this.task.timeLogged && this.task.timeEstimated){
+                return parseInt(this.task.timeLogged) > parseInt(this.task.timeEstimated);
+            }
+            return false;
         },
         canMarkAs: function(){
             if (this.status == 1){
@@ -108,6 +122,29 @@ export default {
                 identifier += possible.charAt(Math.floor(Math.random() * possible.length));
             }
             return identifier;
+        },
+        pastDueDate : function(){
+            if (!this.task.dueDate){
+                return false;
+            }
+            var parts = this.task.dueDate.split('-');
+            var today = new Date();
+            if (parts[2] < today.getFullYear()) {
+                return true;
+            }
+            if (parts[2] > today.getFullYear()) {
+                return false;
+            }
+            if (parts[1] < today.getMonth() + 1){
+                return true;
+            }
+            if (parts[1] > today.getMonth() + 1){
+                return false;
+            }
+            if (parts[0] <= today.getDate()){
+                return true;
+            }
+            return false;
         }
     },
     methods: {
@@ -126,7 +163,20 @@ export default {
     events: {
         'logTimeOpenedFromTaskModal' : function(msg){
             this.needToOpenTaskModal = msg;
+        },
+        'recalculateTimeLogged' : function(msg){
+            if (!this.task.loggedTimeHistory){
+                return 0;
+            }
+            var time = 0;
+            for(var i = 0; i<this.task.loggedTimeHistory.length;i++){
+                time += parseInt(this.task.loggedTimeHistory[i].timeLogged);
+            }
+            this.task.timeLogged = time;
         }
+    },
+    ready: function(){
+        this.$emit('recalculateTimeLogged');
     }
 }
 </script>
@@ -169,10 +219,7 @@ export default {
     background-color:  #cce6ff !important;
 }
 
-.task-panel {
-    max-width: 600px;
-    margin: 0 auto 20px auto;
-}
+
 
 
 </style>

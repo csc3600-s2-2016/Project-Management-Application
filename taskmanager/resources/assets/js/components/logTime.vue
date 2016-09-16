@@ -39,9 +39,8 @@
 
                 <div class="modal-footer">
                     <hr />
-                    <a v-on:click="closeModal">
-                        <button type="button" class="btn btn-primary" v-on:click="save">Save</button>
-                    </a>
+                    <span v-show="showErrors" class="text-warning" style="margin-right:20px;">{{errorHint}}</span>
+                    <button type="button" class="btn btn-primary" v-bind:class="errorHint ? 'disabled' : ''" :title="errorHint" v-on:click="save" >Save</button>
                     <button type="button" class="btn btn-secondary" v-on:click="closeModal">Close</button>
                 </div>
         </div>
@@ -58,12 +57,14 @@ export default {
             startTime: this.todayFormattedString(),
             startTimeObject: new Date(),
             timeLogged: "",
-            notes: ""
+            notes: "",
+            showErrors: false
         }
      },
      props: [
         "id",
         "taskName",
+        "taskTimeLogged",
         "viewTaskModalId",
         "taskHistory",
         "currentUser",
@@ -72,6 +73,22 @@ export default {
      computed: {
         today: function(){
             return new Date();
+        },
+        errorHint: function(){
+            var error = '';
+            if (! this.timeLogged){
+                error = "Amount of time to log is required.";
+            }
+            else {
+                if (this.timeLogged <= 0){
+                    error = "Amount of time to log must be positive.  "
+                }
+                if (this.timeLogged % 0.25 !== 0){
+                    error += "Time must be in increments of 0.25"
+                }
+            }
+
+            return error;
         }
      },
      methods: {
@@ -95,8 +112,13 @@ export default {
                 jQuery('#' + this.viewTaskModalId).modal('show');
                 this.$dispatch('logTimeOpenedFromTaskModal', false);
             }
+            this.refreshContent();
         },
         save: function(){
+            if (this.errorHint){
+                this.showErrors = true;
+                return;
+            }
             var startDate = this.startTimeObject.getDate() + "-" + (this.startTimeObject.getMonth() + 1) + "-" + this.startTimeObject.getFullYear();
             var startTime = this.startTimeObject.getHours() + ":" + this.startTimeObject.getMinutes();
             var log = {'startDate': startDate, 'startTime': startTime, 'timeLogged': this.timeLogged, 'user' : this.users[this.currentUser].displayName, 'notes': this.notes};
@@ -105,6 +127,16 @@ export default {
             } else {
                 this.taskHistory.push(log);
             }
+            this.$dispatch('recalculateTimeLogged', 'true');
+            this.closeModal();
+        },
+        refreshContent: function(){
+            this.timeLogged = "";
+            this.notes = "";
+            this.showErrors = false;
+            this.startTime = this.todayFormattedString();
+            this.today = new Date();
+            this.startTimeObject = new Date();
         }
      },
      ready() {

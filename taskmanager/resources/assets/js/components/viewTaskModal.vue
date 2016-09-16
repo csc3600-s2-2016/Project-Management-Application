@@ -81,13 +81,13 @@
           <table class="taskTimeLoggedTable" v-show="task.dueDate || task.timeLogged || task.timeEstimated" style="max-width:200px;">
             <tr v-show="task.dueDate">
               <td><span class="h5">Due:</span></td>
-              <td><span class="h3">  {{task.dueDate}}</span></td>
+              <td><span class="h3" :class="pastDueDate ? 'text-warning' : '' ">  {{shortDueDate}}</span></td>
           </div>
               <td></td>
             </tr>
             <tr v-show="task.timeLogged">
               <td><span class="h5" v-show="task.timeLogged">Logged:</span></td>
-              <td><span class="h3">{{task.timeLogged}}</span></td>
+              <td><span class="h3" :class="loggedTimeOverBudget ? 'text-warning' : '' ">{{task.timeLogged}}</span></td>
             </tr>
             <tr v-show="task.timeEstimated">
               <td><span class="h5"  v-show="task.timeEstimated">Estimate: </span></td>
@@ -131,8 +131,8 @@
         </thead>
         <tbody>
           <tr v-for="log in task.loggedTimeHistory">
-            <td>{{log.startTime}}</td>
             <td>{{log.startDate}}</td>
+            <td>{{log.startTime}}</td>
             <td>{{log.timeLogged}}</td>
             <td>{{log.user}}</td>
             <td>{{log.notes}}</td>
@@ -173,7 +173,53 @@ export default {
       },
       modalIsLarge: function(){
         return this.modalSize ? true : false;
-      }
+      },
+      shortDueDate: function(){
+        if (!this.task.dueDate){
+          return '';
+        }
+        var parts = this.task.dueDate.split("-");
+        var shortDate = parts[0] + "-";
+        if (parts[1].length == 1){
+          shortDate += "0"
+        }
+        shortDate += parts[1] + "-";
+        if (parts[2].length === 4){
+          return shortDate + parts[2].substring(2);
+        }
+        return shortDate + parts[2];
+      },
+      pastDueDate : function(){
+            if (!this.task.dueDate){
+                return false;
+            }
+            var parts = this.task.dueDate.split('-');
+            var today = new Date();
+            if (parts[2] < today.getFullYear()) {
+                return true;
+            }
+            if (parts[2] > today.getFullYear()) {
+                return false;
+            }
+            if (parts[1] < today.getMonth() + 1){
+                return true;
+            }
+            if (parts[1] > today.getMonth() + 1){
+                return false;
+            }
+            if (parts[0] <= today.getDate()){
+                return true;
+            }
+            return false;
+        },
+        loggedTimeOverBudget : function(){
+            if (this.task.timeLogged && this.task.timeEstimated){
+                if( parseInt(this.task.timeLogged) > parseInt(this.task.timeEstimated) ){
+                  return true;
+                }
+            }
+            return false;
+        }
     },
     methods: {
       showLogTimeModal: function(){

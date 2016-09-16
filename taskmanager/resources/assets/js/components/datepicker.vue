@@ -32,11 +32,12 @@
 
             this.flatpickr = flatpickr(this.$els.flatpickr, {
                 onChange(dateObject, dateString) {
-                    self.dueDate = dateString;
+                    self.dueDate = dateObject.getDate() + "-" + (dateObject.getMonth() + 1) + "-" + dateObject.getFullYear();
                 },
                 defaultDate: this.date,
                 inline: true,
-                enableTime: true
+                enableTime: false,
+                dateFormat: "j F, Y"
             });
 
             if (this.date)

@@ -3,7 +3,7 @@
 	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	        <button type="button" class="close"  @click="close" aria-label="Close">
 	          <span aria-hidden="true">&times;</span>
 	        </button>
 	        <h3 class="modal-title">Create New Task...</h3<hr />
@@ -37,8 +37,9 @@
 
 			<div class="modal-footer">
 				<hr />
-		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-		        <button type="button" class="btn btn-primary" v-on:click="saveTask">Save Task</button>
+				<span v-show="showError && errorHint" class=" text-warning" role="alert">{{errorHint}}</span>
+		        <button type="button" class="btn btn-primary" :title="errorHint" :class="errorHint ? 'disabled' : ''" v-on:click="saveTask" >Save Task</button>
+		        <button type="button" class="btn btn-secondary" @click="close" aria-label="Close">Close</button>
 	      	</div>
 
 	  </div>
@@ -66,23 +67,56 @@ export default {
   	],
   	data () {
         return {
-        	task: {  },
-        	assignedUsers: {}
+        	task: {
+        		name: "",
+        		description:"",
+        		timeLogged: "",
+        		timeEstimated : "",
+        		subtasks : [],
+        		dueDate : "",
+        		loggedTimeHistory: []
+        	},
+        	assignedUsers: {},
+        	showError: false
         }
-    }, 
+    },
+    computed: {
+    	errorHint: function(){
+    		var error = "";
+    		if (!this.task.name || !this.task.name.trim()){
+    			error = "Task name is required. ";
+    		}
+    		if (this.task.timeEstimated){
+	    		if (parseInt(this.task.timeEstimated) < 0 || parseInt(this.task.timeEstimated) % 1 !== 0){
+	    			error += "Estimated time is not valid";
+	    		}
+	    	}
+    		return error;
+    	}
+    },
     methods: {
     	saveTask: function(){
+    		if (this.errorHint){
+    			this.showError = true;
+    			return;
+    		}
+    		this.$broadcast('savingTask', 'removeEmptySubtasks');
     		this.saveAssignedUserIdsToTask();
-    		jQuery('#newTaskModal').modal('hide');
-    		this.$broadcast('refresh', true);
     		this.$dispatch("newTask", this.task);
-    		this.task = {};
+    		this.close();
     	},
     	saveAssignedUserIdsToTask: function(){
     		this.task.assignedUsers = new Array();
     		for (var user in this.assignedUsers){
     			this.task.assignedUsers.push(user);
     		}
+    	},
+    	close: function(){
+    		this.$broadcast('refresh', true);
+    		this.task= {};
+        	this.assignedUsers= {};
+        	this.showError = false;
+    		jQuery('#newTaskModal').modal('hide');
     	}
     },
     events: {

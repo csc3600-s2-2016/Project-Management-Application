@@ -31,7 +31,11 @@
 	text-align: center;
 
 }
-
+.draggingCursor {
+	cursor: grabbing;
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+}
 .timeLoggedTable{
 	@extend p;
 }
@@ -65,17 +69,25 @@
 		    cursor: -webkit-grab;
 		}
 		div:active { 
-		    cursor: grabbing;
-		    cursor: -moz-grabbing;
-		    cursor: -webkit-grabbing;
+		    @extend .draggingCursor;
 		}
 		
 	}
 }
-.draggingCursor {
-	cursor: grabbing;
-	cursor: -moz-grabbing;
-	cursor: -webkit-grabbing;
+.dragDrop{
+	:active{
+		@extend .draggingCursor;
+	}
+}
+.task-panel {
+    max-width: 600px;
+    margin: 0 auto 20px auto;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+a:hover {
+	cursor: pointer;
 }
 .dragToHereClass{
 		    border-radius: 20px;
