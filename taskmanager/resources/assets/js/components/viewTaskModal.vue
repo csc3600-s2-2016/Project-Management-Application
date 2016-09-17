@@ -53,8 +53,8 @@
 
       <div class="h4" v-show="task.subtasks">Subtasks:</div>
         <table style="width:100%;">
-        <tbody v-sortable="subtaskSortableOptions">
-          <tr v-for="subtask in task.subtasks" >
+        <tbody>
+          <tr v-dragable-for="subtask in task.subtasks" :options="subtaskSortableOptions">
             <td style="width:30px;">
                 <div class="checkbox checkbox-small">
                   <label>
@@ -108,6 +108,7 @@
             <a v-on:click="showLogTimeModal">
               <button class="btn btn-primary btn-raised"><span class="fa fa-clock-o"></span> Log Time</button>
             </a>
+            
           </div>
 
 
@@ -117,7 +118,7 @@
     
   </div>
   
-  <section v-show="task.loggedTimeHistory">
+  <section v-show="task.loggedTimeHistory && task.loggedTimeHistory.length > 0">
   <br /><hr />
       <table style="width:100%;" class="table table-striped table-hover timeLoggedTable">
         <thead>
@@ -151,10 +152,11 @@
 export default {
     data () {
         return {
+          colSelect: "",
           subtaskSortableOptions: {
             animation: 250,
             handle: ".sort-handle",
-            ghostClass: "ghostclass"
+            ghostClass: "ghostclass",
           }
         }
     },
@@ -162,7 +164,8 @@ export default {
       "task",
     	"id",
       "users",
-      "logTimeId"
+      "logTimeId",
+      "cols"
     ],
     computed: {
       modalSize: function(){

@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" id="newTaskModal" tabindex="-1" >
+	<div class="modal fade" id="newTaskModal" tabindex="-1">
 	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -21,9 +21,9 @@
 				    <label for="i5" class="control-label">Description</label>
 				    <textArea v-model="task.description" type="text" class="form-control" id="i5" rows="4"></textArea>
 				  </div>
-				  <assign-users :users="users" :assigned.sync="assignedUsers"></assign-users>
+				  <assign-users :users="users" :unassigned.sync="unassignedUsers" :assigned.sync="task.assignedUsers"></assign-users>
 				  <create-subtasks :subtasks.sync="task.subtasks"></create-subtasks>
-			  	</div>
+			  	</div>	
 			 
 			  <div class="col-sm-4 col-sm-offset-1">
 				  
@@ -72,11 +72,12 @@ export default {
         		description:"",
         		timeLogged: "",
         		timeEstimated : "",
-        		subtasks : [],
+        		subtasks : new Array(),
         		dueDate : "",
-        		loggedTimeHistory: []
+        		loggedTimeHistory: new Array(),
+                assignedUsers: [],
         	},
-        	assignedUsers: {},
+            unassignedUsers: [],
         	showError: false
         }
     },
@@ -101,38 +102,38 @@ export default {
     			return;
     		}
     		this.$broadcast('savingTask', 'removeEmptySubtasks');
-    		this.saveAssignedUserIdsToTask();
+            this.unassignedUsers = this.getEveryUserId();
     		this.$dispatch("newTask", this.task);
     		this.close();
     	},
-    	saveAssignedUserIdsToTask: function(){
-    		this.task.assignedUsers = new Array();
-    		for (var user in this.assignedUsers){
-    			this.task.assignedUsers.push(user);
-    		}
-    	},
+        getEveryUserId: function(){
+            var userids = new Array();
+            for (var userid in this.users){
+                userids.push(userid);
+            }
+            return userids;
+        },
     	close: function(){
-    		this.$broadcast('refresh', true);
-    		this.task= {};
-        	this.assignedUsers= {};
-        	this.showError = false;
+    		this.resetContent();
     		jQuery('#newTaskModal').modal('hide');
-    	}
-    },
-    events: {
-    	'assignUser' : function(user){
-    		if (!this.task.assignedUsers){
-    			this.task.assignedUsers = [];
-    		}
-    		this.task.assignedUsers.push(user.id);
     	},
-    	'removeUser' : function(user){
-    		for (var i=0; i<this.task.assignedUsers.length; i++){
-    			if (this.task.assignedUsers[i] === user.id){
-    				this.task.assignedUsers.splice(i,1);
-    			}
-    		}
-    	}
+        resetContent: function(){
+            this.task = {
+                name: "",
+                description:"",
+                timeLogged: "",
+                timeEstimated : "",
+                subtasks : new Array(),
+                dueDate : "",
+                loggedTimeHistory: new Array(),
+                assignedUsers: [],
+            };
+            this.unassignedUsers = this.getEveryUserId();
+            this.showError= false;
+        }
+    },
+    ready: function(){
+        this.resetContent();
     }
 }
 </script>

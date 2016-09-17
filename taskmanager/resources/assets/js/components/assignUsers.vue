@@ -16,7 +16,7 @@
         <tr>
 
             <td id="unassigned" :class="unassignedClass"  v-el:unassigned-container>
-                <div v-for="user in unassigned"  id="{{user.id}}">{{user.displayName}}</div>
+                <div v-for="uid in unassigned"  id="{{uid}}">{{users[uid].displayName}}</div>
             </td>
 
 
@@ -24,7 +24,7 @@
 
 
             <td id="assigned" :class="assignedClass" v-el:assigned-container>
-                <div v-for="user in assigned" id="{{user.id}}">{{user.displayName}}</div>
+                <div v-for="uid in assigned" id="{{uid}}">{{users[uid].displayName}}</div>
             </td>
 
 
@@ -35,10 +35,9 @@
 
 <script>
 export default {
-    props: ["users", "assigned"],
+    props: ["users", "unassigned", "assigned"],
     data () {
         return {
-            unassigned: {},
             assignedClass: "notDraggingClass",
             unassignedClass: "notDraggingClass"
         }
@@ -48,14 +47,11 @@ export default {
     events: {
         'refresh' : function(refreshRequired){
             if (refreshRequired){
-                this.assigned = {};
-                this.unassigned = jQuery.extend({}, this.users);
             }
         }
     },
     ready: function(){
         var that = this;
-        this.unassigned = jQuery.extend({}, this.users); //copy all users into unassigned
         Sortable = require('sortablejs');
         Sortable.create(this.$els.assignedContainer, {
             group: {name:'assigned', put:['unassigned']},
@@ -67,14 +63,15 @@ export default {
                 that.unassignedClass = "notDraggingClass"
             },
             onRemove: function(event){
-                var item = event.item;
-                that.unassigned[item.id] = {'id': item.id, 'displayName':item.innerText};
-                delete that.assigned[item.id];
+                var uid = event.item.id;
+                that.unassigned.push(uid);
+                that.assigned.splice(that.assigned.indexOf(uid), 1);
             },
             onAdd: function(event){
-                var item = event.item;
-                that.assigned[item.id] = {'id': item.id, 'displayName':item.innerText};
-                delete that.unassigned[item.id];
+                var uid = event.item.id;
+                that.assigned.push(uid);
+                that.unassigned.splice(that.unassigned.indexOf(uid), 1);
+
             }
         });
         Sortable.create(this.$els.unassignedContainer, 

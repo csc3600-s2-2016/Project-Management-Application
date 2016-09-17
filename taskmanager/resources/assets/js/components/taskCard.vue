@@ -7,7 +7,7 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <template id="taskCard-template">
 <div>
-<view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task.sync="task" :users="users"></view-task-modal>
+<view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task.sync="task" :users="users" :cols="cols"></view-task-modal>
 <log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :task-time-logged.sync="task.timeLogged" :current-user="currentUser" :users="users"></log-time>
 <div class="panel panel-default task-panel">
     <div class="panel-heading task-summary">
@@ -30,7 +30,7 @@
                             <i class="fa fa-clock-o taskMenuIcon" aria-hidden="true"></i> Log Time
                         </a>
                     </li>
-                    <li><a href="#"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
+                    <li><a @click="editTask"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
                 </ul>
             </div>
         </div>
@@ -60,8 +60,8 @@
     </div>
 
     <div class="panel-body" v-show='showSubtasks'>
-        <ul class="subtaskList" v-sortable="{animation: 250}">
-            <li v-for="subtask in task.subtasks">
+        <ul class="subtaskList">
+            <li v-dragable-for="subtask in task.subtasks" :options="{animation:250}">
                 {{ subtask.description }}
             </li>
         </ul>
@@ -87,7 +87,9 @@ export default {
     props: [
         "task",
         "users",
-        "currentUser"
+        "currentUser",
+        "cols",
+        "id"
     ],
     computed: {
         timeSummary: function(){
@@ -145,6 +147,14 @@ export default {
                 return true;
             }
             return false;
+        },
+        sortableOptions: function(){
+            return {
+                animation: 250,
+                onDrop: {
+
+                }
+            };
         }
     },
     methods: {
@@ -154,6 +164,9 @@ export default {
         openLogTimeModal: function(){
             this.needToOpenTaskModal = false;
             jQuery('#' + this.randomIdentifier + 'logtime').modal('show');
+        },
+        editTask: function(){
+            this.$dispatch('editTask', this.id);
         }
     },
     components: {

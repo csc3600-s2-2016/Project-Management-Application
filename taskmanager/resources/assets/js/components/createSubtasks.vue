@@ -33,6 +33,8 @@ export default {
         }
      },
      props: ["subtasks"],
+     computed: {
+     },
      methods: {
         addNewSubtask: function(){
             

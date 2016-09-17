@@ -5,10 +5,9 @@
 				{{name}}
 			</span>
 		</div>
-		<div class="task-column" :style="colPadding" @dragover.prevent="dragOver" @drop="colDropZone">
+		<div class="task-column" :style="colPadding" v-sortable="sortableOptions">
 
-				<task-card v-for="(key, task) in colTasks | orderBy 'priority' "  :task.sync="task" :users="users" :current-user="currentUser" :id="key"
-                 draggable="true" @dragstart="dragStart" class="taskCard"></task-card>
+				<task-card v-for="(key, task) in colTasks | orderBy 'priority' "  :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" class="taskCard"></task-card>
 
 		</div>
 	</div>
@@ -30,6 +29,76 @@ export default {
         };
     },
     computed: {
+        sortableOptions: function(){
+            var that = this;
+            return{
+                animation: 100,
+                group: {
+                    name: that.name, 
+                    put: that.puttableColumns()
+                },
+                onAdd: function(event){
+                    
+                    var taskAdded = that.tasks[event.item.id];
+                    if (!taskAdded){ return; }
+                    console.log(event.item.id);
+                    var newPriority = event.newIndex;
+                    for (var id in that.colTasks){
+                        if (that.tasks[id].priority >= newPriority){
+                            that.tasks[id].priority++;
+                        }
+                    }
+                    taskAdded.status = that.colID;
+                    taskAdded.priority = newPriority;
+                    that.tasks = Object.assign({}, that.tasks );
+                    
+                },
+                onUpdate: function(event){
+                    var taskMoved = that.tasks[event.item.id];
+                    taskMoved.priority = -1;
+                    var newPriority = event.newIndex;
+                    var oldPriority = event.oldIndex;
+                    var taskPriorityIsIncreased = oldPriority > newPriority ? true : false;
+                    for (var id in that.colTasks){
+                        var rivalPriority = that.colTasks[id].priority;
+                        if (taskPriorityIsIncreased){
+                            if (rivalPriority >= newPriority && rivalPriority < oldPriority){
+                                that.colTasks[id].priority++
+                            }
+                        } else {
+                            if (rivalPriority <= newPriority && rivalPriority > oldPriority){
+                                that.colTasks[id].priority--
+                            }
+                        }
+                        taskMoved.priority = newPriority;
+                    }
+
+                    taskMoved.priority = newPriority;
+                },
+                onRemove: function(event){
+                    var length = that.colTasks.length;
+                    var sortedPrioritys = new Array();
+
+
+                    for (var id in that.colTasks){
+                        var nextsmallest = that.colTasks[id].priority;
+                        for (var idsToCheck in that.colTasks){
+                            var nextPriorityToCheck = that.colTasks[idsToCheck].priority;
+                            if (nextsmallest > nextPriorityToCheck && sortedPrioritys.indexOf(nextPriorityToCheck) === -1){
+                                nextsmallest = nextPriorityToCheck;
+                            }
+                        }
+                        sortedPrioritys.push(id);
+                    }
+
+                    for (var i=0; i<sortedPrioritys.length;i++){
+                        var taskID = sortedPrioritys[i];
+                        that.colTasks[taskID].priority = i;
+                    }
+
+                }
+            };
+        },
         colID: function(){
             for (var i=0;i<this.colNames.length;i++){
                 if (this.colNames[i] === this.name){
@@ -82,56 +151,8 @@ export default {
     			}
     		}
     		return cols;
-    	},
-        dragStart: function(event){
-            event.dataTransfer.setData("text/plain", event.target.id);
-        },
-        dragOver: function(event){
-        },
-        colDropZone: function(event){
-            var taskDragged = event.dataTransfer.getData("text/plain");
+    	}
 
-
-
-            
-            if (event.target.classList.contains('task-column')){
-                this.tasks[taskDragged].status = this.colID;
-                var nextPriority = 0;
-                for (var id in this.colTasks){
-                    if (this.colTasks[id].priority > nextPriority){
-                        nextPriority = this.colTasks[id].priority + 1;
-                    }
-                }
-                this.tasks[taskDragged].priority = nextPriority;
-                return
-            }
-
-            
-
-
-
-            var taskCard = '';
-            var eventItem = event.target.parentElement;
-            while (!taskCard){
-                if (eventItem.classList.contains("taskCard")){
-                    taskCard = eventItem;
-                } else {
-                    eventItem = eventItem.parentElement;
-                }
-            }
-            var taskDropped = this.tasks[taskCard.id];
-
-            
-            this.tasks[taskDragged].priority = taskDropped.priority;
-            for (var taskid in this.colTasks){
-                if (this.colTasks[taskid].priority >= taskDropped.priority){
-                    this.colTasks[taskid].priority++
-                }
-            }
-
-            this.tasks[taskDragged].status = this.colID;
-
-        }
     },
     components: {
     	taskCard: TaskCard
