@@ -5,8 +5,8 @@
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - 
                 TEMPLATE
 - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-<template id="taskCard-template">
-<div>
+<template >
+<div :id="id">
 <view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task.sync="task" :users="users" :cols="cols"></view-task-modal>
 <log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :task-time-logged.sync="task.timeLogged" :current-user="currentUser" :users="users"></log-time>
 <div class="panel panel-default task-panel">
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="h6">
-            <span v-show="task.dueDate" :class="pastDueDate ? 'text-danger' : ''">Due {{ task.dueDate }}</span>
+            <span v-show="task.dueDate" :class="pastDueDate ? 'text-danger' : ''">Due {{ dueDateString }}</span>
             <span v-show="timeSummary" :class="loggedTimeOverBudget ? 'text-danger' : '' "> [{{ timeSummary }}] </span>
         </div> 
         
@@ -45,7 +45,7 @@
                     <td>
                          <div v-for="userID in task.assignedUsers" class="label label-username">{{users[userID].displayName}}</div>
                     </td>
-                    <td v-if="task.subtasks" class="text-right">
+                    <td v-if="task.subtasks && task.subtasks.length > 0" class="text-right">
                         <a v-on:click="toggleSubtasks" >
                         <span class='badge'>
                             <i v-bind:class="[ 'fa', showSubtasks ? 'fa-caret-up' : 'fa-caret-down' ]" aria-hidden="true"></i>
@@ -62,7 +62,7 @@
     <div class="panel-body" v-show='showSubtasks'>
         <ul class="subtaskList">
             <li v-dragable-for="subtask in task.subtasks" :options="{animation:250}">
-                {{ subtask.description }}
+                {{ subtask.name }}
             </li>
         </ul>
     </div>
@@ -92,8 +92,15 @@ export default {
         "id"
     ],
     computed: {
+        dueDateString: function(){
+            if (this.task.dueDate){
+                return this.task.dueDate.toDateString();
+            }
+            return "";
+        },
         timeSummary: function(){
             var summary = '';
+            console.log(this.task.timeLogged);
             if (this.task.timeLogged){
                 summary += this.task.timeLogged + "/";
             }
@@ -111,11 +118,6 @@ export default {
             }
             return false;
         },
-        canMarkAs: function(){
-            if (this.status == 1){
-                return 
-            }
-        },
         randomIdentifier: function(){
             var identifierLength = 16;
             var identifier = "";
@@ -126,27 +128,7 @@ export default {
             return identifier;
         },
         pastDueDate : function(){
-            if (!this.task.dueDate){
-                return false;
-            }
-            var parts = this.task.dueDate.split('-');
-            var today = new Date();
-            if (parts[2] < today.getFullYear()) {
-                return true;
-            }
-            if (parts[2] > today.getFullYear()) {
-                return false;
-            }
-            if (parts[1] < today.getMonth() + 1){
-                return true;
-            }
-            if (parts[1] > today.getMonth() + 1){
-                return false;
-            }
-            if (parts[0] <= today.getDate()){
-                return true;
-            }
-            return false;
+            return  this.task.dueDate ? (this.task.dueDate.getTime() < Date.now()) : false;
         },
         sortableOptions: function(){
             return {

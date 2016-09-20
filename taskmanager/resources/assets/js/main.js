@@ -4,7 +4,7 @@
 var Vue = require('vue');
 var Sortable = require('vue-sortable');
 var VDragableFor = require('vuedragablefor');
-require('vue-resource');
+var VueResoure = require('vue-resource');
 require('vue-sortable');
 global.jQuery = require('jquery');
 require('flatpickr');
@@ -14,14 +14,15 @@ var material = require('bootstrap-material-design');
 //Add components
 
 import TaskManagementApp from './components/taskManagementApp.vue';
-import DatePicker from './components/datepicker.vue';
 
 
 
 
 Vue.use(Sortable);
 Vue.use(VDragableFor);
-Vue.component("datePicker", DatePicker);
+Vue.use(VueResoure);
+
+Vue.http.headers.common['X-CSRF-TOKEN'] = jQuery('meta[name="csrf-token"]').attr('content');
 
 var taskApp = new Vue({
   el: 'body',

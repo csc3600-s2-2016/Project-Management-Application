@@ -7,7 +7,7 @@
 		</div>
 		<div class="task-column" :style="colPadding" v-sortable="sortableOptions">
 
-				<task-card v-for="(key, task) in colTasks | orderBy 'priority' "  :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" class="taskCard"></task-card>
+				<task-card v-for="(key, task) in colTasks | orderBy 'priority' " :id="key"  :task.sync="task" :users="users" :current-user="currentUser" :cols="colNames" class="taskCard"></task-card>
 
 		</div>
 	</div>
@@ -41,7 +41,7 @@ export default {
                     
                     var taskAdded = that.tasks[event.item.id];
                     if (!taskAdded){ return; }
-                    console.log(event.item.id);
+
                     var newPriority = event.newIndex;
                     for (var id in that.colTasks){
                         if (that.tasks[id].priority >= newPriority){
@@ -50,8 +50,7 @@ export default {
                     }
                     taskAdded.status = that.colID;
                     taskAdded.priority = newPriority;
-                    that.tasks = Object.assign({}, that.tasks );
-                    
+                    that.tasks = jQuery.extend({}, that.tasks );
                 },
                 onUpdate: function(event){
                     var taskMoved = that.tasks[event.item.id];

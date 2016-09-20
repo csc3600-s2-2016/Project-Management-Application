@@ -111,7 +111,6 @@ export default {
                 return;
             }
             this.$broadcast('savingTask', 'removeEmptySubtasks');
-            this.saveAssignedUserIdsToTask();
             this.$dispatch('saveTask', this.task);
             this.close();
         },

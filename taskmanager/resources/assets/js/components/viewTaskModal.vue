@@ -3,9 +3,6 @@
     width: 80%;
     margin: auto;
   }
-  .taskTimeLoggedTable td {
-    width: 50%;
-  }
   .taskTimeLoggedTable td:nth-child(2) {
     text-align: right;
   }
@@ -63,7 +60,7 @@
                 </div>
             </td>
             <td>
-                {{ subtask.description }}
+                {{ subtask.name }}
             </td>
             <td v-show="task.subtasks.length > 1" class="sort-handle text-right" style="width:20px;">
               <span class="fa fa-sort"></span>
@@ -123,19 +120,19 @@
       <table style="width:100%;" class="table table-striped table-hover timeLoggedTable">
         <thead>
           <tr>
-            <th>Start Date</th>
-            <th>Start Time</th>
-            <th>Time Logged</th>
-            <th>Team Member</th>
+            <th class="text-center">Start Date</th>
+            <th class="text-center">Start Time</th>
+            <th class="text-center">Time Logged</th>
+            <th class="text-center">Team Member</th>
             <th>Notes</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="log in task.loggedTimeHistory">
-            <td>{{log.startDate}}</td>
-            <td>{{log.startTime}}</td>
-            <td>{{log.timeLogged}}</td>
-            <td>{{log.user}}</td>
+            <td class="text-right" style="min-width:100px;">{{getStartDate(log.startDateTime)}}</td>
+            <td class="text-right" style="min-width:100px;">{{getStartTime(log.startDateTime)}}</td>
+            <td class="text-right" style="min-width:100px;">{{log.timeLogged}}</td>
+            <td style="min-width:120px;">{{users[log.user].displayName}}</td>
             <td>{{log.notes}}</td>
           </tr>
         </tbody>
@@ -181,55 +178,34 @@ export default {
         if (!this.task.dueDate){
           return '';
         }
-        var parts = this.task.dueDate.split("-");
-        var shortDate = parts[0] + "-";
-        if (parts[1].length == 1){
-          shortDate += "0"
-        }
-        shortDate += parts[1] + "-";
-        if (parts[2].length === 4){
-          return shortDate + parts[2].substring(2);
-        }
-        return shortDate + parts[2];
+        return (this.task.dueDate.getDate() + "-" + (this.task.dueDate.getMonth() + 1) + "-" + this.task.dueDate.getFullYear());
       },
       pastDueDate : function(){
-            if (!this.task.dueDate){
-                return false;
-            }
-            var parts = this.task.dueDate.split('-');
-            var today = new Date();
-            if (parts[2] < today.getFullYear()) {
+            return this.dueDate > Date.now();
+      },
+      loggedTimeOverBudget : function(){
+          if (this.task.timeLogged && this.task.timeEstimated){
+              if( parseInt(this.task.timeLogged) > parseInt(this.task.timeEstimated) ){
                 return true;
-            }
-            if (parts[2] > today.getFullYear()) {
-                return false;
-            }
-            if (parts[1] < today.getMonth() + 1){
-                return true;
-            }
-            if (parts[1] > today.getMonth() + 1){
-                return false;
-            }
-            if (parts[0] <= today.getDate()){
-                return true;
-            }
-            return false;
-        },
-        loggedTimeOverBudget : function(){
-            if (this.task.timeLogged && this.task.timeEstimated){
-                if( parseInt(this.task.timeLogged) > parseInt(this.task.timeEstimated) ){
-                  return true;
-                }
-            }
-            return false;
-        }
+              }
+          }
+          return false;
+      }
     },
     methods: {
       showLogTimeModal: function(){
         this.$dispatch('logTimeOpenedFromTaskModal', true);
         jQuery("#" + this.id).modal('hide');
         jQuery('#' + this.logTimeId).modal('show');
-      }
+      },
+      getStartDate: function(startDateTime){
+        if (!startDateTime){ return '' };
+        return startDateTime.getDate() + "-" + (startDateTime.getMonth() + 1) + "-" + startDateTime.getFullYear();
+      },
+      getStartTime: function(startDateTime){
+        if (!startDateTime){ return '' };
+        return (startDateTime.getHours() % 12) + ":" + (startDateTime.getMinutes() < 10 ? '0' + startDateTime.getMinutes() : startDateTime.getMinutes()) + (startDateTime.getHours() >= 12 ? ' PM' : ' AM');
+      },
     },
     ready: function(){
       jQuery.material.checkbox();

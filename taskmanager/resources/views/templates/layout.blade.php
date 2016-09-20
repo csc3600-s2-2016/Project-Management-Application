@@ -8,6 +8,7 @@
     <meta name="description" content="An Online Project Management Application">
     <meta name="author" content="Team FooBar">
     <meta name="keywords" content="Project, Management, Software, Task, App">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="/favicon.ico">
 
     <title>{{ config('app.name') }}</title>

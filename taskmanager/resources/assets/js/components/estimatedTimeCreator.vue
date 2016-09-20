@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import Datepicker from './datepicker.vue';
 export default {
     props: [
         "estimatedTime"

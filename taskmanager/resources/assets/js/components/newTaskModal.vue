@@ -95,6 +95,11 @@ export default {
     		return error;
     	}
     },
+    watch: {
+    	'users' : function(){
+    		this.unassignedUsers = this.getEveryUserId();
+    	}
+    },
     methods: {
     	saveTask: function(){
     		if (this.errorHint){

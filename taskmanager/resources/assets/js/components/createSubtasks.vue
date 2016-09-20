@@ -15,7 +15,7 @@
         <template v-for="subtask in subtasks" track-by="priority">
             <div class="form-group"  style="margin:0px;">
                     <div class="input-group">
-                        <input v-model="subtask.description" type="text" class="form-control" placeholder="Subtask description">
+                        <input v-model="subtask.name" type="text" class="form-control" placeholder="Subtask name">
                         <div class="input-group-addon">
                             <span class="btn btn-primary btn-xs btn-raised" v-on:click="removeSubtask(subtask.priority)" data-toggle="tooltip" data-placement="bottom" title="Remove subtask">&times;</span>
                         </div>
@@ -48,7 +48,7 @@ export default {
                 nextIndex = 0;
             }
 
-            var subtask = {'priority': nextIndex, 'description' : '', 'complete': false};
+            var subtask = {'priority': nextIndex, 'name' : '', 'complete': false};
             this.subtasks.push(subtask);
         },
         removeSubtask: function(index){
@@ -56,7 +56,7 @@ export default {
             var priority = 0;
             for (var i = 0; i<this.subtasks.length; i++){
                 if (i !== index){
-                    subtasks.push( {'priority': priority++, 'description' : this.subtasks[i].description, 'complete': false} );
+                    subtasks.push( {'priority': priority++, 'name' : this.subtasks[i].name, 'complete': false} );
                 }
             }
             this.subtasks = subtasks;
@@ -72,8 +72,8 @@ export default {
             var subtasks = new Array();
             var priority = 0;
             for (var i = 0; i<this.subtasks.length; i++){
-                if (this.subtasks[i].description.trim().length > 0){
-                    subtasks.push( {'priority': priority++, 'description' : this.subtasks[i].description, 'complete': false} );
+                if (this.subtasks[i].name.trim().length > 0){
+                    subtasks.push( {'priority': priority++, 'name' : this.subtasks[i].name, 'complete': false} );
                 }
             }
             if (subtasks.length === 0){

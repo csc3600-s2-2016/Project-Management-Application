@@ -119,9 +119,7 @@ export default {
                 this.showErrors = true;
                 return;
             }
-            var startDate = this.startTimeObject.getDate() + "-" + (this.startTimeObject.getMonth() + 1) + "-" + this.startTimeObject.getFullYear();
-            var startTime = this.startTimeObject.getHours() + ":" + this.startTimeObject.getMinutes();
-            var log = {'startDate': startDate, 'startTime': startTime, 'timeLogged': this.timeLogged, 'user' : this.users[this.currentUser].displayName, 'notes': this.notes};
+            var log = {'startDateTime': this.startTimeObject, 'timeLogged': this.timeLogged, 'user' : this.users[this.currentUser].displayName, 'notes': this.notes};
             if (this.taskHistory == null){
                 this.taskHistory = [ log ];
             } else {

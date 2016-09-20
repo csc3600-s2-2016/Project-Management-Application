@@ -15,8 +15,8 @@
         </tr>
         <tr>
 
-            <td id="unassigned" :class="unassignedClass"  v-el:unassigned-container>
-                <div v-for="uid in unassigned"  id="{{uid}}">{{users[uid].displayName}}</div>
+            <td id="unassigned" :class="unassignedClass"  v-el:unassigned-container >
+                <div v-for="uid in unassigned"  id="{{uid}}">{{users[uid].displayName }}</div>
             </td>
 
 
@@ -53,6 +53,7 @@ export default {
     ready: function(){
         var that = this;
         Sortable = require('sortablejs');
+        try{
         Sortable.create(this.$els.assignedContainer, {
             group: {name:'assigned', put:['unassigned']},
             animation: 250,
@@ -86,6 +87,9 @@ export default {
                 }
             }
         );
+    }catch(err){
+
+    }
     }
 }
 

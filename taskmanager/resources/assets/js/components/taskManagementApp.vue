@@ -17,90 +17,17 @@ import EditTaskModal from './editTaskModal.vue';
 export default {
     data () {
         return {
+            serverAddress: '192.168.33.10',
             categories: [
                 "To Do", "In Progress", "Completed", "Too Hard Basket"
             ],
         	tasks: {
-        		// t01: {
-        		// 	name:"Some Task",
-        		// 	description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel quisquam odio, voluptates ipsa iure, recusandae aliquam!",
-          //           assignedUsers: [
-          //               "u1", "u4", "u6"
-          //           ],
-          //           dueDate: "24-05-2016",
-          //           timeLogged: "4",
-          //           timeEstimated: "20",
-          //           subtasks: [
-          //               {description: "Lorem ipsum dolor sit amet.", complete: false},
-          //               {description: "Consectetur adipisicing elit. Aliquam, quia.", complete: true},
-          //               {description: "Lorem ipsum dolor sit amet, consectetur adipisicing.", complete: true}
-          //           ],
-          //           status: 0,
-          //           priority: 0,
-          //           loggedTimeHistory: [
-          //               {startDate: "11-06-2016", startTime: "15:03", timeLogged: "4", user:"Matt", notes:"I hated this task!"},
-          //               {startDate: "11-06-2016", startTime: "15:42", timeLogged: "6", user:"Tony", notes:"I Loved this task!"},
-          //               {startDate: "11-06-2016", startTime: "15:03", timeLogged: "4", user:"Matt", notes:"I hated this task!"},
-          //               {startDate: "11-06-2016", startTime: "15:42", timeLogged: "6", user:"Tony", notes:"I Loved this task!"}
-          //           ]
-        		// },
-          //       t02: {
-          //           name:"Find the one armed, one eyed, one legged man!",
-          //           description: "Placeat amet vitae eos expedita rem labore! Magni, quaerat incidunt. Perferendis architecto, id vitae omnis sit libero, voluptate qui voluptas similique accusantium!",
-          //           assignedUsers: [
-          //               "u4", "u5"
-          //           ],
-          //           dueDate: "24-11-2016",
-          //           timeLogged: "",
-          //           timeEstimated: "20",
-          //           subtasks: [
-          //               {description: "Maxime, harum!", complete: false}
-          //           ],
-          //           status: 1,
-          //           priority: 0,
-          //       },
-          //       t03: {
-          //           name:"Finish coding these components",
-          //           description: "Placeat amet vitae eos expedita rem labore! Magni, quaerat incidunt. Perferendis architecto, id vitae omnis sit libero, voluptate qui voluptas similique accusantium!",
-          //           assignedUsers: [
-          //               "u2"
-          //           ],
-          //           dueDate: "14-12-2016",
-          //           timeLogged: "4",
-          //           timeEstimated: "20",
-          //           subtasks: [
-          //               {description: "Code this", complete: false},
-          //               {description: "Code that", complete: false}
-          //           ],
-          //           status: 0,
-          //           priority: 2
-          //       },
-          //       t04: {
-          //           name:"Lorem ipsum dolor.",
-          //           timeLogged: "",
-          //           dueDate: "2-3-16",
-          //           status: 0,
-          //           priority: 1
-          //       },
-          //       t05: {
-          //           name:"Watch game of thrones",
-          //           dueDate: "",
-          //           timeLogged: "",
-          //           timeEstimated: "",
-          //           assignedUsers: [
-          //               "u6", "u5", "u1", "u3"
-          //           ],
-          //           status: 3,
-          //           priority: 0
-          //       }
+        		
         	},
             users: {
                 u1: {id: "u1", displayName:"John"},
                 u2: {id: "u2", displayName:"Sarah"},
-                u3: {id: "u3", displayName:"Tony"},
-                u4: {id: "u4", displayName:"Jill"},
-                u5: {id: "u5", displayName:"Anontio"},
-                u6: {id: "u6", displayName:"Emma"}
+                
             },
             currentUser: "u5",
             taskToEdit: ''
@@ -121,26 +48,63 @@ export default {
         editTaskModal: EditTaskModal
     },
     methods: {
-        generateTempKeyREPLACE_THIS_METHOD_ONCE_DATABASE_GENERATES_KEY_FOR_US: function(){
+        keyGenerator: function(){
             var identifierLength = 8;
             var identifier = "";
             var possible = "0123456789";
             for(var i = 0; i < identifierLength; i++) {
                 identifier += possible.charAt(Math.floor(Math.random() * possible.length));
             }
-            return 't' + identifier;
+            return 'TEMPORARY' + identifier;
+        },
+        processIncomingTasksData : function(tasks){
+            for (var id in tasks){
+
+                //convert duedate to Date object
+                if (tasks[id].dueDate){
+                    tasks[id].dueDate = new Date(tasks[id].dueDate);
+                }
+
+                // convert logged times to Date object
+                if (tasks[id].loggedTimeHistory.constructor === Array){
+                    for (var i=0; i<tasks[id].loggedTimeHistory.length; i++){
+                        var log = tasks[id].loggedTimeHistory[i];
+                        log.task = 't' + log.task;
+                        log.startDateTime = new Date(log.start_date_time);
+                        delete log.start_date_time;
+                        log.timeLogged = log.time_logged;
+                        delete log.time_logged;
+                        log.user = 'u' + log.user_id;
+                        delete log.user_id;
+                    }
+                }
+
+                //add calculated fields
+                tasks[id].timeLogged = "";
+            }
+            return tasks;
         }
     },
     events: {
         'newTask': function(newTask){
-            var nextId = this.generateTempKeyREPLACE_THIS_METHOD_ONCE_DATABASE_GENERATES_KEY_FOR_US();
+            var tempID = this.keyGenerator();
             newTask.status = 0;
             newTask.priority = 0;
             for (var id in this.tasks){
                 newTask.priority++;
             }
-            this.tasks[nextId] = newTask;
+            this.tasks[tempID] = newTask;
             this.tasks = Object.assign({}, this.tasks );
+
+            //send task to server, then 
+            var dataPackage = {'newtask': newTask, 'tempID': tempID};
+            this.$http.post("/taskdata", dataPackage).then((response) =>{
+                console.log("Data sent to server");
+                // this.tasks[response.tempID] = this.tasks[response.newID];
+                // delete this.tasks[response.tempID];
+            }, (response) => {
+                console.log("Failed to send data to server");
+            });
         },
         'editTask': function(taskId){
             this.taskToEdit = {'id': taskId, 'data': jQuery.extend({}, this.tasks[taskId])};
@@ -150,9 +114,22 @@ export default {
             jQuery('#editTaskModal').modal('show');
         },
         'saveTask' : function(task){
-            this.tasks[task.id] = jQuery.extend({}, task.data);
+            this.tasks[task.id] = Object.assign({}, task.data);
             this.taskToEdit = {};
+        },
+        'sendToServer' : function(data){
+            
         }
-    }
+    },
+    ready: function(){
+        this.$http.get('/taskdata').then((response) => {
+            this.tasks = Object.assign({}, this.tasks, this.processIncomingTasksData(response.json().tasks));
+            this.users = (response.json().users);
+
+        }, (response) =>{
+            console.log("Error");
+        });
+        this.$emit('sendToServer', {task:true})
+    },
 }
 </script>
