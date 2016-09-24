@@ -70,7 +70,7 @@ class taskController extends Controller
     		$userJSON->displayName = $user->display_name;
     		$projectData->users["u" . $user->id] = $userJSON;
     	}
-        $projectData->currentUser = session('user_id');  //for testing purposes!!
+        $projectData->currentUser = 'u'.session('user_id');  //for testing purposes!!
 
 
     	return json_encode($projectData);
@@ -151,6 +151,7 @@ class Notification {
     public $data;
     public $project;
     public $updateType;
+    public $updatedBy;
     public $shouldBroadcast = false;
 }
 
@@ -192,6 +193,7 @@ class UpdatedData {
         $this->notification->message = "$usersDisplayName created a new task:\n $task->name";
         $this->notification->project = $this->project;
         $this->notification->data = $request->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
         $this->notification->data["id"] = "t".$task->id;
         $this->notification->updateType = $this->updateType;
         $this->notification->shouldBroadcast = true;

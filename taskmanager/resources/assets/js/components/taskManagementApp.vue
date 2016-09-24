@@ -31,8 +31,8 @@ export default {
                 u2: {id: "u2", displayName:"Sarah"},
                 
             },
-            currentUser: "u5",
-            taskToEdit: ''
+            currentUser: "",
+            taskToEdit: ""
         }
     },
     computed:{
@@ -146,10 +146,12 @@ export default {
     },
     ready: function(){
 
-        //load tasks from server
+        //load project from server
         this.$http.get('/taskdata').then((response) => {
-            this.tasks = Object.assign({}, this.tasks, this.processIncomingTasksData(response.json().tasks));
+            var tasks = this.processIncomingTasksData(response.json().tasks);
+            this.tasks = Object.assign({}, this.tasks, tasks);
             this.users = (response.json().users);
+            this.currentUser = (response.json().currentUser);
         }, (response) =>{
             console.log("Error loading tasks from server!");
         });
@@ -169,10 +171,12 @@ export default {
             console.log("User " + userID + " is online.");
         });
         socket.on('newTask', function(sentStuff){
-            console.log(sentStuff.message);
-            var task = {};
-            task[sentStuff.data.id] = sentStuff.data.newtask;
-            vm.tasks = Object.assign(vm.tasks, task);
+            if (sentStuff.updatedBy !== vm.currentUser){
+                console.log(sentStuff.message);
+                var task = {};
+                task[sentStuff.data.id] = sentStuff.data.newtask;
+                vm.tasks = Object.assign({}, vm.tasks, task);
+            }
 
         });
 

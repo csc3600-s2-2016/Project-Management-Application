@@ -7,7 +7,7 @@
 		</div>
 		<div class="task-column" :style="colPadding" v-sortable="sortableOptions">
 
-				<task-card v-for="(key, task) in colTasks | orderBy 'priority' " :id="key"  :task.sync="task" :users="users" :current-user="currentUser" :cols="colNames" class="taskCard"></task-card>
+				<task-card v-for="(key, task) in colTasks | orderBy 'priority' " :id="key"  :track-by="key" :task.sync="task" :users="users" :current-user="currentUser" :cols="colNames" class="taskCard"></task-card>
 
 		</div>
 	</div>
