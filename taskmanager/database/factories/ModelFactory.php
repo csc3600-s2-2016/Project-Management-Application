@@ -44,7 +44,7 @@ $factory->define(App\Subtask::class, function (Faker\Generator $faker) {
 $factory->define(App\LoggedTime::class, function (Faker\Generator $faker) {
     return [
         'start_date_time' => $faker->dateTimeThisYear,
-        'notes' => $faker->sentence($nbWords = 7, $variableNbWords = true),
+        'notes' => $faker->optional()->sentence($nbWords = 7, $variableNbWords = true),
         'time_logged' => $faker->numberBetween($min=1, $max=10),
     ];
 });

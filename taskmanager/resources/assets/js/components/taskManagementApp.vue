@@ -11,6 +11,8 @@
 </template>
 
 <script>
+var io = require('socket.io-client');
+var socket = io('http://192.168.33.10:3000');
 import NewTaskModal from './newTaskModal.vue';
 import TaskColumn from './taskColumn.vue';
 import EditTaskModal from './editTaskModal.vue';
@@ -83,6 +85,21 @@ export default {
                 tasks[id].timeLogged = "";
             }
             return tasks;
+        },
+        getCookie : function(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length,c.length);
+                }
+            }
+            return "";
         }
     },
     events: {
@@ -91,17 +108,19 @@ export default {
             newTask.status = 0;
             newTask.priority = 0;
             for (var id in this.tasks){
-                newTask.priority++;
+                if (this.tasks[id].status === 0){
+                    newTask.priority++;
+                }
             }
             this.tasks[tempID] = newTask;
             this.tasks = Object.assign({}, this.tasks );
 
-            //send task to server, then 
-            var dataPackage = {'newtask': newTask, 'tempID': tempID};
-            this.$http.post("/taskdata", dataPackage).then((response) =>{
+            //send task to server
+            var dataPackage = {'updateType':'newTask','newtask': newTask, 'tempID': tempID};
+            this.$http.post("/taskdata", dataPackage, {'headers': {'Content-Type': 'application/json'}}).then((response) =>{
                 console.log("Data sent to server");
-                // this.tasks[response.tempID] = this.tasks[response.newID];
-                // delete this.tasks[response.tempID];
+                this.tasks[response.json().newID] = this.tasks[response.json().tempID];
+                delete this.tasks[response.json().tempID];
             }, (response) => {
                 console.log("Failed to send data to server");
             });
@@ -118,18 +137,45 @@ export default {
             this.taskToEdit = {};
         },
         'sendToServer' : function(data){
-            
+        this.$http.post('/taskdata', data).then((response) => {
+            console.log("sucessfully sent data to server");
+        }, (response) => {
+            //todo handle error
+        });
         }
     },
     ready: function(){
+
+        //load tasks from server
         this.$http.get('/taskdata').then((response) => {
             this.tasks = Object.assign({}, this.tasks, this.processIncomingTasksData(response.json().tasks));
             this.users = (response.json().users);
-
         }, (response) =>{
-            console.log("Error");
+            console.log("Error loading tasks from server!");
         });
-        this.$emit('sendToServer', {task:true})
+
+        var vm = this;
+        console.log(vm.getCookie('socketKey'));
+        //setup websocket for future incoming data
+        socket.on("connect", function(){
+            
+            socket.emit('authenticate', vm.getCookie('socketKey'));
+            console.log("Connection to server established");
+        });
+        socket.on("disconnect", function(){
+            console.log("Disconnected from server");
+        });
+        socket.on('userOnline', function(userID){
+            console.log("User " + userID + " is online.");
+        });
+        socket.on('newTask', function(sentStuff){
+            console.log(sentStuff.message);
+            var task = {};
+            task[sentStuff.data.id] = sentStuff.data.newtask;
+            vm.tasks = Object.assign(vm.tasks, task);
+
+        });
+
     },
 }
 </script>
