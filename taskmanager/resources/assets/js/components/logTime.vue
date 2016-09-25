@@ -63,6 +63,7 @@ export default {
      },
      props: [
         "id",
+        "taskId",
         "taskName",
         "taskTimeLogged",
         "viewTaskModalId",
@@ -119,12 +120,22 @@ export default {
                 this.showErrors = true;
                 return;
             }
-            var log = {'startDateTime': this.startTimeObject, 'timeLogged': this.timeLogged, 'user' : this.users[this.currentUser].displayName, 'notes': this.notes};
+            var log = {
+                'startDateTime': this.startTimeObject, 
+                'timeLogged': this.timeLogged, 
+                'user' : this.users[this.currentUser],
+                'notes': this.notes
+            };
+            var dataPackageForServer = {
+                "log": log,
+                "taskId": this.taskId
+            }
             if (this.taskHistory == null){
                 this.taskHistory = [ log ];
             } else {
                 this.taskHistory.push(log);
             }
+            this.$dispatch('logTime', dataPackageForServer);
             this.$dispatch('recalculateTimeLogged', 'true');
             this.closeModal();
         },

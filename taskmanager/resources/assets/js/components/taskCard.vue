@@ -8,7 +8,7 @@
 <template >
 <div :id="id">
 <view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task.sync="task" :users="users" :cols="cols"></view-task-modal>
-<log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :task-time-logged.sync="task.timeLogged" :current-user="currentUser" :users="users"></log-time>
+<log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :task-id="id" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :task-time-logged.sync="task.timeLogged" :current-user="currentUser" :users="users"></log-time>
 <div class="panel panel-default task-panel">
     <div class="panel-heading task-summary">
         <div class=row>

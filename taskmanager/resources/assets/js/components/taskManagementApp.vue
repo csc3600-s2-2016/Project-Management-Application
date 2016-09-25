@@ -100,6 +100,13 @@ export default {
                 }
             }
             return "";
+        },
+        sendToServer : function(dataPackage){
+            this.$http.post("/taskdata", dataPackage, {'headers': {'Content-Type': 'application/json'}}).then((response) =>{
+                //success
+            }, (response) => {
+                console.log("Failed to send data to server");
+            });
         }
     },
     events: {
@@ -117,10 +124,27 @@ export default {
 
             //send task to server
             var dataPackage = {'updateType':'newTask','newtask': newTask, 'tempID': tempID};
+            console.log(dataPackage);
             this.$http.post("/taskdata", dataPackage, {'headers': {'Content-Type': 'application/json'}}).then((response) =>{
-                console.log("Data sent to server");
-                this.tasks[response.json().newID] = this.tasks[response.json().tempID];
-                delete this.tasks[response.json().tempID];
+                var jsonResponse = response.json();
+
+                //change subtask ids to reflect those in database
+                var subtasks = this.tasks[jsonResponse.tempID].subtasks;
+                for (var tempid in jsonResponse.subtaskIds){
+                    for (var i = 0; i<subtasks.length; i++ ){
+                        if(subtasks[i].tempID === tempid){
+                            subtasks[i].id = jsonResponse.subtaskIds[tempid];
+                            delete subtasks[i].tempID;
+                            continue;
+                        }
+                    }
+                }
+
+                //change task id to reflect database
+                this.tasks[jsonResponse.newID] = this.tasks[jsonResponse.tempID];
+                delete this.tasks[jsonResponse.tempID];
+
+                
             }, (response) => {
                 console.log("Failed to send data to server");
             });
@@ -136,12 +160,19 @@ export default {
             this.tasks[task.id] = Object.assign({}, task.data);
             this.taskToEdit = {};
         },
-        'sendToServer' : function(data){
-        this.$http.post('/taskdata', data).then((response) => {
-            console.log("sucessfully sent data to server");
-        }, (response) => {
-            //todo handle error
-        });
+        'prioritiesUpdated': function(priorities){
+            this.sendToServer( {'updateType':'changeTaskPrioritys','priorities': priorities} );
+            
+        },
+        'changeTaskStatus': function(statusData){
+            this.sendToServer( {'updateType':'changeTaskStatus','statusData': statusData} );
+        },
+        'completeSubtask': function(data){
+            this.sendToServer({"updateType": "completeSubtask", "data": data});
+        },
+        'logTime': function(data){
+            console.log(data);
+            this.sendToServer({"updateType": "logTime", "logData": data});
         }
     },
     ready: function(){
@@ -177,8 +208,47 @@ export default {
                 task[sentStuff.data.id] = sentStuff.data.newtask;
                 vm.tasks = Object.assign({}, vm.tasks, task);
             }
-
         });
+        socket.on('changeTaskStatus', function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                vm.tasks[sentStuff.data.statusData.taskid].status = sentStuff.data.statusData.newStatus;
+            // }
+        });
+        socket.on('changeTaskPrioritys', function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                for (var i = 0; i<sentStuff.data.priorities.length; i++){
+                    var taskID = sentStuff.data.priorities[i];
+                    vm.tasks[taskID].priority = i;
+                }                
+            // }
+        });
+        socket.on("completeSubtask", function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                console.log(sentStuff.message);
+                var subtasks = vm.tasks["t" + sentStuff.data.data.taskId].subtasks;
+                for (var i = subtasks.length - 1; i >= 0; i--) {
+                    if (subtasks[i].id === sentStuff.data.data.subtaskId){
+                        subtasks[i].complete = sentStuff.data.data.complete;
+                        break;
+                    }
+                }
+            // }
+        });
+        socket.on("logTime", function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                console.log(sentStuff.message);
+                var log = sentStuff.data.logData.log;
+                log.startDateTime = new Date(log.startDateTime);
+                log.user = log.user.id;
+                var history = vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory;
+                if (Array.isArray(history)){
+                    vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory.push(log);
+                } else {
+                    vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory = [ log ];
+                }
+            // }
+        });
+
 
     },
 }

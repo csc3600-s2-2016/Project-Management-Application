@@ -55,7 +55,7 @@
             <td style="width:30px;">
                 <div class="checkbox checkbox-small">
                   <label>
-                    <input type="checkbox" v-model="subtask.complete">
+                    <input type="checkbox" v-model="subtask.complete" v-on:click="updateSubtaskStatus(event, $index)">
                   </label>
                 </div>
             </td>
@@ -206,6 +206,10 @@ export default {
         if (!startDateTime){ return '' };
         return (startDateTime.getHours() % 12) + ":" + (startDateTime.getMinutes() < 10 ? '0' + startDateTime.getMinutes() : startDateTime.getMinutes()) + (startDateTime.getHours() >= 12 ? ' PM' : ' AM');
       },
+      updateSubtaskStatus: function(event, i) {
+        var data = {"subtaskId": this.task.subtasks[i].id, "complete": !this.task.subtasks[i].complete , "taskId": this.task.subtasks[i].task};
+        this.$dispatch('completeSubtask', data);
+      }
     },
     ready: function(){
       jQuery.material.checkbox();

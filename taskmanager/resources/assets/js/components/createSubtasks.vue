@@ -48,7 +48,7 @@ export default {
                 nextIndex = 0;
             }
 
-            var subtask = {'priority': nextIndex, 'name' : '', 'complete': false};
+            var subtask = {'priority': nextIndex, 'name' : '', 'complete': false,};
             this.subtasks.push(subtask);
         },
         removeSubtask: function(index){
@@ -61,6 +61,15 @@ export default {
             }
             this.subtasks = subtasks;
 
+        },
+        randomID: function(){
+            var identifierLength = 8;
+            var identifier = "";
+            var possible = "ABCDEFGHIFJLMNOPQRSTUVWXYZ";
+            for(var i = 0; i < identifierLength; i++) {
+                identifier += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return identifier;
         }
      },
      events: {
@@ -73,7 +82,7 @@ export default {
             var priority = 0;
             for (var i = 0; i<this.subtasks.length; i++){
                 if (this.subtasks[i].name.trim().length > 0){
-                    subtasks.push( {'priority': priority++, 'name' : this.subtasks[i].name, 'complete': false} );
+                    subtasks.push( {'priority': priority++, 'name' : this.subtasks[i].name, 'complete': false,  "tempID": this.randomID()} );
                 }
             }
             if (subtasks.length === 0){

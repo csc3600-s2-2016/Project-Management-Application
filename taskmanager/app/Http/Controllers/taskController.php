@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\User;
 use App\Task;
+use App\Subtask;
+use App\LoggedTime;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redis;
 
@@ -185,9 +187,20 @@ class UpdatedData {
         $task->due_date = $request->input('newtask.dueDate');
         $task->created_by = $this->updatedBy;
         $task->save();
+        $subtasks = $request->input('newtask.subtasks');
+        $subtaskIds = array();
+        for ($i=0; $i < count($subtasks); $i++) { 
+            $subtask = new Subtask([
+                "name" => $subtasks[$i]['name'],
+                "priority" => $subtasks[$i]['priority'],
+                "complete" => $subtasks[$i]['complete']
+            ]);
+            $task->subtasks()->save($subtask);
+            $subtaskIds[$subtasks[$i]['tempID']] = $subtask->id;
+        }
 
 
-        $this->response = json_encode(['newID' => $task->id, 'tempID' => $request->input('tempID')]);
+        $this->response = json_encode(['newID' => $task->id, 'tempID' => $request->input('tempID'), 'subtaskIds' => $subtaskIds]);
         // $this->response->header('Content-Type', 'application/json');
         $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
         $this->notification->message = "$usersDisplayName created a new task:\n $task->name";
@@ -199,29 +212,107 @@ class UpdatedData {
         $this->notification->shouldBroadcast = true;
     }
 
+    private function changeTaskPrioritys($request){
+        $priorities = $request->input('priorities');
+        for ($i=0; $i < count($priorities); $i++) { 
+            $taskid = $priorities[$i];
+            $taskid = substr_replace($taskid, '', 0, 1);
+            $task = Task::find($taskid);
+            $task->priority = $i;
+            $task->save();
+            
+
+        }
+
+        $this->notification->message = null;
+        $this->notification->project = $this->project;
+        $this->notification->data = $request->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
+
+    private function changeTaskStatus($request){
+        $statusData = $request->input('statusData');
+        $taskid = substr_replace($statusData['taskid'], '', 0, 1);
+        $task = Task::find($taskid);
+        $task->status = $statusData['newStatus'];
+        $task->save();
+        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $this->notification->message = "$usersDisplayName moved task from \"" . $statusData['oldStatus'] . "\" to \"" . $statusData['newStatus'] . "\".";
+        $this->notification->project = $this->project;
+        $this->notification->data = $request->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
+
+    private function completeSubtask($request){
+        $subtaskId = $request->input('data.subtaskId');
+        $subtask = Subtask::find($subtaskId);
+        $subtask->complete = $request->input('data.complete');
+        $subtask->save();
+        $completionAction = $request->input('data.complete') ? "completed" : "un-completed";
+        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $this->notification->message = "$usersDisplayName $completionAction subtask \"$subtask->name\" from the task \"";
+        $this->notification->message .= Task::find($request->input('data.taskId'))->name . "\"";
+        $this->notification->project = $this->project;
+        $this->notification->data = $request->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
+
+    private function logTime($req){
+        $log = $req->input('logData.log');
+        $taskid = substr_replace(($req->input('logData.taskId')), '', 0, 1);
+        $task = Task::find($taskid);
+        $userId = $log["user"]["id"];
+        if (strpos($userId, "u") == 0){
+            $userId = substr_replace($userId, '', 0, 1);
+        }
+        $user = User::find($userId);
+        $loggedTime = new LoggedTime;
+        $loggedTime->user_id = $user->id; //TODO:   CHECK THIS!!!!
+        // $user->loggedTimes()->associate($loggedTime); //TODO:   CHECK THIS!!!!
+        $loggedTime->start_date_time = $log["startDateTime"];
+        $loggedTime->time_logged = $log["timeLogged"];
+        $loggedTime->notes = $log["notes"];
+        $task->loggedTimes()->save($loggedTime);
+        $this->response = json_encode(['logId' => $loggedTime->id, 'tempLogId' => '']); //todo:  save id in front end
+
+        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $this->notification->message = "$usersDisplayName logged time for the task \"$task->name\"";
+        $this->notification->project = $this->project;
+        $this->notification->data = $req->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
+
     private function performUpdate($req){
         switch ($this->updateType) {
             case "newTask":
                 $this->newTask($req);
                 break;
-            // case "changeTaskPriority":
-            //     $this->changeTaskPriority($req);
-            //     break;
+            case "changeTaskPrioritys":
+                $this->changeTaskPrioritys($req);
+                break;
             // case "changeSubtaskPriority":
             //     $this->changeSubtaskPriority($req);
             //     break;
             // case "editTask":
             //     $this->editTask($req);
             //     break;
-            // case "completeSubtask":
-            //     $this->completeSubtask($req);
-            //     break;
-            // case "changeTaskStatus":
-            //     $this->changeTaskStatus($req);
-            //     break;
-            // case "logTime":
-            //     $this->logTime($req);
-            //     break;
+            case "completeSubtask":
+                $this->completeSubtask($req);
+                break;
+            case "changeTaskStatus":
+                $this->changeTaskStatus($req);
+                break;
+            case "logTime":
+                $this->logTime($req);
+                break;
             // case "archiveTask":
             //     $this->archiveTask($req);
             //     break;

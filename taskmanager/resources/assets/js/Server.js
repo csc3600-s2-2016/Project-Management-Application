@@ -1,3 +1,4 @@
+
 var server = require('http').Server();
 var io = require('socket.io')(server);
 var Redis = require('ioredis');
@@ -42,18 +43,6 @@ io.on('connection', function(socket){
 	
 });
 
-
-function parseCookies (request) {
-    // var list = {},
-    //     rc = request.headers.cookie;
-
-    // rc && rc.split(';').forEach(function( cookie ) {
-    //     var parts = cookie.split('=');
-    //     list[parts.shift().trim()] = decodeURI(parts.join('='));
-    // });
-
-    // return list;
-}
 
 
 server.listen(3000);
