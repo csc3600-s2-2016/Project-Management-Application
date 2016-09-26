@@ -49,25 +49,27 @@
 
 
       <div class="h4" v-show="task.subtasks">Subtasks:</div>
-        <table style="width:100%;">
-        <tbody>
-          <tr v-dragable-for="subtask in task.subtasks" :options="subtaskSortableOptions">
-            <td style="width:30px;">
-                <div class="checkbox checkbox-small">
-                  <label>
-                    <input type="checkbox" v-model="subtask.complete" v-on:click="updateSubtaskStatus(event, $index)">
-                  </label>
-                </div>
-            </td>
-            <td>
-                {{ subtask.name }}
-            </td>
-            <td v-show="task.subtasks.length > 1" class="sort-handle text-right" style="width:20px;">
-              <span class="fa fa-sort"></span>
-            </td>
+
+      <table style="width:100%;" v-sortable="subtaskSortableOptions">
+        <tbody v-for="subtask in task.subtasks">
+          <tr>
+              <td style="width:30px;">
+                  <div class="checkbox checkbox-small">
+                    <label>
+                      <input type="checkbox" v-model="subtask.complete" v-on:click="updateSubtaskStatus(event, $index)">
+                    </label>
+                  </div>
+              </td>
+              <td>
+                  {{ subtask.name }}
+              </td>
+              <td v-show="task.subtasks.length > 1" class="sort-handle text-right" style="width:20px;">
+                <span class="fa fa-sort"></span>
+              </td>
           </tr>
           </tbody>
         </table>
+
     </section>
 
 
@@ -149,22 +151,55 @@
 export default {
     data () {
         return {
-          colSelect: "",
-          subtaskSortableOptions: {
-            animation: 250,
-            handle: ".sort-handle",
-            ghostClass: "ghostclass",
-          }
+          colSelect: ""
         }
     },
     props: [
       "task",
     	"id",
+      "taskId",
       "users",
       "logTimeId",
       "cols"
     ],
     computed: {
+      subtaskSortableOptions: function() {
+          var vm = this;
+          return {
+            animation: 250,
+            handle: ".sort-handle",
+            ghostClass: "ghostclass",
+            onUpdate: function(event){
+                var increasePriority = event.newIndex < event.oldIndex;
+                var dataPackageForServerUpdate = {"taskId":vm.taskId, "subtasks": {}};
+
+
+                //update priotities
+                if(increasePriority){
+                  for (var i = event.newIndex; i < event.oldIndex; i++){
+                    vm.task.subtasks[i].priority++;
+                  }
+                } else {
+                  for (var i = event.newIndex; i > event.oldIndex; i--){
+                    vm.task.subtasks[i].priority--;
+                  }
+                }
+                vm.task.subtasks[event.oldIndex].priority = event.newIndex;
+
+                //sort array based on new priorities
+                vm.task.subtasks.sort(function(a,b){
+                  return a.priority - b.priority;
+                });
+
+                //save to server
+                var subtasks = vm.task.subtasks;
+                for (var i = 0; i < subtasks.length; i++){
+                  dataPackageForServerUpdate.subtasks[subtasks[i].id] = subtasks[i].priority;
+                }
+                vm.$dispatch('updateSubtaskPriorites', dataPackageForServerUpdate);
+            }
+          }
+      },
       modalSize: function(){
         if (this.task.description || this.task.subtasks){
           return "modal-lg";

@@ -1,5 +1,21 @@
+<style>
+.disablePage {
+    height: 100vh;
+    margin: 0;
+    width: 100%;
+    z-index: 1600;
+    opacity: 0.4;
+    background-color: black;
+    cursor: not-allowed;
+    position: fixed;
+    display: inline-block;
+    left: 0;
+}
+</style>
+
 <template>
 <div>
+    <div :class="disconnectedFromServer ? 'disablePage' : '' "></div>
 	<new-task-modal :users="users"></new-task-modal>
     <edit-task-modal id="editTaskModal" :task="taskToEdit" :users="users"></edit-task-modal>
     <div :style="container">
@@ -32,7 +48,9 @@ export default {
                 
             },
             currentUser: "",
-            taskToEdit: ""
+            taskToEdit: "",
+            disconnectedFromServer : false
+
         }
     },
     computed:{
@@ -186,27 +204,31 @@ export default {
             this.tasks = Object.assign({}, this.tasks, tasks);
             this.users = (response.json().users);
             this.currentUser = (response.json().currentUser);
+            toastr.success("Project loaded :)");
         }, (response) =>{
-            console.log("Error loading tasks from server!");
+            toast.error("Error loading tasks from server!");
         });
 
         var vm = this;
-        console.log(vm.getCookie('socketKey'));
         //setup websocket for future incoming data
         socket.on("connect", function(){
-            
+            vm.disconnectedFromServer = false;
             socket.emit('authenticate', vm.getCookie('socketKey'));
-            console.log("Connection to server established");
+        });
+        socket.on("reconnect", function(){
+            vm.disconnectedFromServer = false;
+            toastr.success("Connection to server re-established");
         });
         socket.on("disconnect", function(){
-            console.log("Disconnected from server");
+            vm.disconnectedFromServer = true;
+            toastr.warning("Disconnected from server");
         });
         socket.on('userOnline', function(userID){
-            console.log("User " + userID + " is online.");
+            toastr.info("User " + userID + " is online.");
         });
         socket.on('newTask', function(sentStuff){
             if (sentStuff.updatedBy !== vm.currentUser){
-                console.log(sentStuff.message);
+                toastr.info(sentStuff.message);
                 var task = {};
                 task[sentStuff.data.id] = sentStuff.data.newtask;
                 vm.tasks = Object.assign({}, vm.tasks, task);
@@ -214,6 +236,7 @@ export default {
         });
         socket.on('changeTaskStatus', function(sentStuff){
             // if (sentStuff.updatedBy !== vm.currentUser){
+                toastr.info(sentStuff.message);
                 vm.tasks[sentStuff.data.statusData.taskid].status = sentStuff.data.statusData.newStatus;
             // }
         });
@@ -227,7 +250,7 @@ export default {
         });
         socket.on("completeSubtask", function(sentStuff){
             // if (sentStuff.updatedBy !== vm.currentUser){
-                console.log(sentStuff.message);
+                toastr.info(sentStuff.message);
                 var subtasks = vm.tasks["t" + sentStuff.data.data.taskId].subtasks;
                 for (var i = subtasks.length - 1; i >= 0; i--) {
                     if (subtasks[i].id === sentStuff.data.data.subtaskId){
@@ -239,7 +262,7 @@ export default {
         });
         socket.on("logTime", function(sentStuff){
             // if (sentStuff.updatedBy !== vm.currentUser){
-                console.log(sentStuff.message);
+                toastr.info(sentStuff.message);
                 var log = sentStuff.data.logData.log;
                 log.startDateTime = new Date(log.startDateTime);
                 log.user = log.user.id;
@@ -253,19 +276,19 @@ export default {
         });
         socket.on("updateSubtaskPriorites", function(sentStuff){
             // if (sentStuff.updatedBy !== vm.currentUser){
-                console.log(sentStuff.message);
-                console.log(sentStuff);
+                toastr.info(sentStuff.message);
                 var taskToUpdate = vm.tasks[sentStuff.data.subtaskPriorityData.taskId];
-                console.log(taskToUpdate);
                 for (var id in sentStuff.data.subtaskPriorityData.subtasks){
                     for (var i = 0; i< taskToUpdate.subtasks.length; i++){
-                        if (taskToUpdate.subtasks[i].id === id){
-                            taskToUpdate.subtasks[i].priority = sentStuff.data.subtaskPriorityData.subtasks[id];
+                        if (taskToUpdate.subtasks[i].id == id){
+                            vm.tasks[sentStuff.data.subtaskPriorityData.taskId].subtasks[i].priority = sentStuff.data.subtaskPriorityData.subtasks[id];
+                        } else {
+
                         }
                     }
                     
                 }
-                taskToUpdate.subtasks.sort(function(a, b){
+                vm.tasks[sentStuff.data.subtaskPriorityData.taskId].subtasks.sort(function(a, b){
                     return a.priority - b.priority;
                 })
             // }

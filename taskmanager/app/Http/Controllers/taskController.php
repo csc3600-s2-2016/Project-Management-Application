@@ -30,7 +30,7 @@ class taskController extends Controller
 
         //generate key for websocket authentication.
         $socketKey = $this->keygen();
-        Redis::setEx(  $socketKey, 60, json_encode( session()->all() )    );
+        Redis::setEx(  $socketKey, 6000, json_encode( session()->all() )    );
 
 
         //return the tasks page with the websocket key as cookie
@@ -53,10 +53,10 @@ class taskController extends Controller
     		$taskJSON->priority = $task->priority;
     		$taskJSON->status = $task->status;
     		$taskJSON->timeEstimated = $task->time_estimated;
-    		foreach ($task->subtasks as $subtask) {
+    		foreach ($task->subtasks->sortBy('priority') as $subtask) {
     			array_push($taskJSON->subtasks, $subtask);
        		}
-       		foreach ($task->loggedTimes as $loggedTime) {
+       		foreach ($task->loggedTimes->sortBy('start_date_time') as $loggedTime) {
        			array_push($taskJSON->loggedTimeHistory, $loggedTime);
        		}
        		foreach ($task->users as $userTask) {
@@ -313,7 +313,7 @@ class UpdatedData {
 
     private function performUpdate($req){
         switch ($this->updateType) {
-            case "newTask":
+            case "newTask":                 //still need to create userstasks database records for this action!
                 $this->newTask($req);
                 break;
             case "changeTaskPrioritys":
@@ -334,7 +334,7 @@ class UpdatedData {
             case "logTime":
                 $this->logTime($req);
                 break;
-            // case "archiveTask":
+            // case "archiveTask":                  //need to implement an archive task button and then only load un-archived tasks
             //     $this->archiveTask($req);
             //     break;
             default:

@@ -7,7 +7,7 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <template >
 <div :id="id">
-<view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task.sync="task" :users="users" :cols="cols"></view-task-modal>
+<view-task-modal :id="randomIdentifier" :log-time-id="randomIdentifier + 'logtime'" :task-id="id" :task.sync="task" :users="users" :cols="cols"></view-task-modal>
 <log-time :id="randomIdentifier + 'logtime'" :task-name="task.name" :task-id="id" :view-task-modal-id="randomIdentifier" :task-history.sync="task.loggedTimeHistory" :task-time-logged.sync="task.timeLogged" :current-user="currentUser" :users="users"></log-time>
 <div class="panel panel-default task-panel">
     <div class="panel-heading task-summary">
@@ -61,7 +61,7 @@
 
     <div class="panel-body" v-show='showSubtasks'>
         <ul class="subtaskList">
-            <li v-dragable-for="subtask in task.subtasks" :options="{animation:250}">
+            <li v-for="subtask in task.subtasks" :class="subtask.complete ? 'line-through' : '' " >
                 {{ subtask.name }}
             </li>
         </ul>
@@ -151,18 +151,6 @@ export default {
             this.$dispatch('editTask', this.id);
         }
     },
-    watch: {
-        'task.subtasks' : function(newVal, oldVal){
-            if (oldVal && newVal !== oldVal ){ //do something to prevent infinite loop!
-                var dataPackageForServerUpdate = {"taskId":this.id, "subtasks": {}};
-                for (var i = 0; i<newVal.length; i++){
-                    newVal[i].priority = i;
-                    dataPackageForServerUpdate.subtasks[newVal[i].id] = i;
-                }
-                this.$dispatch('updateSubtaskPriorites', dataPackageForServerUpdate);
-            }
-        }
-    },
     components: {
         viewTaskModal: ViewTaskModal,
         logTime: LogTime
@@ -225,7 +213,9 @@ export default {
 .task-summary:hover {
     background-color:  #cce6ff !important;
 }
-
+.line-through{
+    text-decoration: line-through;
+}
 
 
 

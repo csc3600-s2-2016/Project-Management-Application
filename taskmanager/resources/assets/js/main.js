@@ -10,6 +10,7 @@ global.jQuery = require('jquery');
 var Flatpickr = require('flatpickr');
 var Bootstrap = require('bootstrap');
 var Material = require('bootstrap-material-design');
+global.toastr = require('toastr');
 
 
 
@@ -23,6 +24,9 @@ Vue.use(VueResoure);
 
 Vue.http.headers.common['X-CSRF-TOKEN'] = jQuery('meta[name="csrf-token"]').attr('content');
 
+toastr.options.preventDuplicates = true;
+toastr.options.positionClass = 'toast-bottom-left';
+toastr.options.timeOut = 6000;
 
 var taskApp = new Vue({
   el: 'body',
