@@ -151,6 +151,18 @@ export default {
             this.$dispatch('editTask', this.id);
         }
     },
+    watch: {
+        'task.subtasks' : function(newVal, oldVal){
+            if (oldVal && newVal !== oldVal ){ //do something to prevent infinite loop!
+                var dataPackageForServerUpdate = {"taskId":this.id, "subtasks": {}};
+                for (var i = 0; i<newVal.length; i++){
+                    newVal[i].priority = i;
+                    dataPackageForServerUpdate.subtasks[newVal[i].id] = i;
+                }
+                this.$dispatch('updateSubtaskPriorites', dataPackageForServerUpdate);
+            }
+        }
+    },
     components: {
         viewTaskModal: ViewTaskModal,
         logTime: LogTime

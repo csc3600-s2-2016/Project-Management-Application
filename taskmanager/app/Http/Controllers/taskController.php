@@ -273,8 +273,7 @@ class UpdatedData {
         }
         $user = User::find($userId);
         $loggedTime = new LoggedTime;
-        $loggedTime->user_id = $user->id; //TODO:   CHECK THIS!!!!
-        // $user->loggedTimes()->associate($loggedTime); //TODO:   CHECK THIS!!!!
+        $loggedTime->user_id = $user->id; 
         $loggedTime->start_date_time = $log["startDateTime"];
         $loggedTime->time_logged = $log["timeLogged"];
         $loggedTime->notes = $log["notes"];
@@ -290,6 +289,28 @@ class UpdatedData {
         $this->notification->shouldBroadcast = true;
     }
 
+    public function updateSubtaskPriorites($req){
+        $subtaskData = $req->input('subtaskPriorityData.subtasks');
+        $taskid = $req->input('subtaskPriorityData.taskId');
+        if (strpos($taskid, "t") == 0){
+            $taskid = substr_replace($taskid, '', 0, 1);
+        }
+        $task = Task::find($taskid);
+        foreach ($subtaskData as $id => $priority) {
+            $subtask = Subtask::find($id);
+            $subtask->priority = $priority;
+            $subtask->save();
+        }
+
+        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $this->notification->message = "$usersDisplayName re-ordered subtasks for \"$task->name\"";
+        $this->notification->project = $this->project;
+        $this->notification->data = $req->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
+
     private function performUpdate($req){
         switch ($this->updateType) {
             case "newTask":
@@ -298,9 +319,9 @@ class UpdatedData {
             case "changeTaskPrioritys":
                 $this->changeTaskPrioritys($req);
                 break;
-            // case "changeSubtaskPriority":
-            //     $this->changeSubtaskPriority($req);
-            //     break;
+            case "updateSubtaskPriorites":
+                $this->updateSubtaskPriorites($req);
+                break;
             // case "editTask":
             //     $this->editTask($req);
             //     break;

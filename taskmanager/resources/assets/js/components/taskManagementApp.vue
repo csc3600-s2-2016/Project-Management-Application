@@ -171,8 +171,11 @@ export default {
             this.sendToServer({"updateType": "completeSubtask", "data": data});
         },
         'logTime': function(data){
-            console.log(data);
             this.sendToServer({"updateType": "logTime", "logData": data});
+        },
+        'updateSubtaskPriorites' : function(data){
+            console.log(data);
+            this.sendToServer({"updateType": "updateSubtaskPriorites", "subtaskPriorityData": data});
         }
     },
     ready: function(){
@@ -246,6 +249,25 @@ export default {
                 } else {
                     vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory = [ log ];
                 }
+            // }
+        });
+        socket.on("updateSubtaskPriorites", function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                console.log(sentStuff.message);
+                console.log(sentStuff);
+                var taskToUpdate = vm.tasks[sentStuff.data.subtaskPriorityData.taskId];
+                console.log(taskToUpdate);
+                for (var id in sentStuff.data.subtaskPriorityData.subtasks){
+                    for (var i = 0; i< taskToUpdate.subtasks.length; i++){
+                        if (taskToUpdate.subtasks[i].id === id){
+                            taskToUpdate.subtasks[i].priority = sentStuff.data.subtaskPriorityData.subtasks[id];
+                        }
+                    }
+                    
+                }
+                taskToUpdate.subtasks.sort(function(a, b){
+                    return a.priority - b.priority;
+                })
             // }
         });
 
