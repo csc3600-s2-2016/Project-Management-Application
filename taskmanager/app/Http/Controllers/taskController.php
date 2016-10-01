@@ -14,7 +14,15 @@ use Illuminate\Support\Facades\Redis;
 
 class taskController extends Controller
 {
-	
+	/**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }   
 
     public function store(){
     	return view('tasks');
@@ -28,9 +36,10 @@ class taskController extends Controller
         //put some dummy data in session for testing
         session(["project" => "testProject"]);
         //for testing
-        $redisdata = (["project" => session("project")]);
-        $redisdata["user"] = (["id"=>"u" . Auth::user()->id, "name"=>Auth::user()->display_name ]);   //for testing!!
-
+        if (Auth::check()) {
+            $redisdata = (["project" => session("project")]);
+            $redisdata["user"] = (["id"=>"u" . Auth::user()->id, "name"=>Auth::user()->display_name ]);   //for testing!!
+        }
         //generate key for websocket authentication.
         $socketKey = $this->keygen();
         Redis::setEx(  $socketKey, 6000, json_encode( $redisdata )    );

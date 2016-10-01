@@ -5,7 +5,7 @@
 				{{name}}
 			</span>
 		</div>
-        <div class="task-column" :style="colPadding" @dragover.prevent="dragOver" @drop="colDropZone">
+        <div class="task-column" :style="colPadding" @dragover.prevent="dragOver" @drop.prevent="colDropZone">
                 <div v-if="colID === 0" class="btn btn-raised btn-primary" style="width:100%;margin-top:0px;" data-toggle="modal" data-target="#newTaskModal">create new task</div>
 
                 <task-card v-for="(key, task) in tasks | filterBy colID in 'status' | orderBy 'priority' " :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" 
@@ -91,6 +91,7 @@ export default {
 
         },
         colDropZone: function(event){
+
             var dragged = event.dataTransfer.getData("text/plain");
             var oldStatus = this.tasks[dragged].status;
             var newStatus = this.colID
@@ -141,17 +142,20 @@ export default {
                 }
 
                 // if task dragged from another column then re-order both cols
-                if (newStatus !== oldStatus)
+                if (newStatus !== oldStatus){
                     for (var id in this.colTasks){
                         if (this.colTasks[id].priority >= newPriority){
                             this.colTasks[id].priority ++;
                         }
                     }
+
                     this.tasks[dragged].priority = newPriority;
                     this.changeTaskStatus(dragged, newStatus, oldStatus);
                     this.tasks[dragged].status = newStatus;
                     this.saveSortedArray(this.sortTasksIntoNewArray(newStatus));
                     this.saveSortedArray(this.sortTasksIntoNewArray(oldStatus));
+                }
+                return false;
             }
         },
         changeTaskStatus: function(taskid, newStatus, oldStatus){
