@@ -36,10 +36,9 @@
             <ul class="nav navbar-nav">
               @if (Auth::guest())
               @else
-              <li class="active"><a href="#">Projects</a></li>
-              <li><a href="#">Tasks</a></li>
-              <li><a href="#">Review</a></li>
-              <li><a data-toggle="modal" data-target="#newTaskModal">Create New Task</a></li>
+              <li class="active"><a href="/projects">Projects</a></li>
+              <li><a href="/tasks">Tasks</a></li>
+              <li><a href="/review">Review</a></li>
               @endif
             </ul>
       
@@ -55,7 +54,7 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                                <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
                             </ul>
                         </li>
                     @endif

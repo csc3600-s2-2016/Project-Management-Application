@@ -11,6 +11,7 @@ use App\LoggedTime;
 use App\UsersTask;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Collection;
 
 class taskController extends Controller
@@ -34,13 +35,12 @@ class taskController extends Controller
     *       - generates key to authenticate user for websocket subscription
     */
     public function index(){
-        //put some dummy data in session for testing
-        session(['project' => 'testProject']);   //for testing!!
-        session(['user_id' => 1]);   //for testing!!
+        //for testing
+        $redisdata = (['project' => 'testProject', 'userId'=>Auth::user()->id, 'userName'=>Auth::user()->display_name ]);   //for testing!!
 
         //generate key for websocket authentication.
         $socketKey = $this->keygen();
-        Redis::setEx(  $socketKey, 6000, json_encode( session()->all() )    );
+        Redis::setEx(  $socketKey, 6000, json_encode( $redisdata )    );
 
 
         //return the tasks page with the websocket key as cookie
@@ -82,7 +82,7 @@ class taskController extends Controller
     		$userJSON->displayName = $user->display_name;
     		$projectData->users["u" . $user->id] = $userJSON;
     	}
-        $projectData->currentUser = 'u'.session('user_id');  //for testing purposes!!
+        $projectData->currentUser = Auth::user()->display_name;  //for testing purposes!!
 
 
     	return json_encode($projectData);
@@ -175,7 +175,7 @@ class UpdatedData {
     public $notification;
 
     public function __construct($request){
-        $this->updatedBy = session('user_id');
+        $this->updatedBy = Auth::user()->id;
         $this->project = session('project');
         $this->updateType = $request->input('updateType');
         $this->notification = new Notification();
@@ -387,11 +387,7 @@ class UpdatedData {
         $log = $req->input('logData.log');
         $taskid = substr_replace(($req->input('logData.taskId')), '', 0, 1);
         $task = Task::find($taskid);
-        $userId = $log["user"]["id"];
-        if (strpos($userId, "u") == 0){
-            $userId = substr_replace($userId, '', 0, 1);
-        }
-        $user = User::find($userId);
+        $user = Auth::user();
         $loggedTime = new LoggedTime;
         $loggedTime->user_id = $user->id; 
         $loggedTime->start_date_time = $log["startDateTime"];

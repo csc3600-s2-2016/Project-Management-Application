@@ -6,6 +6,7 @@
 			</span>
 		</div>
         <div class="task-column" :style="colPadding" @dragover.prevent="dragOver" @drop="colDropZone">
+                <div v-if="colID === 0" class="btn btn-raised btn-primary" style="width:100%;margin-top:0px;" data-toggle="modal" data-target="#newTaskModal">create new task</div>
 
                 <task-card v-for="(key, task) in tasks | filterBy colID in 'status' | orderBy 'priority' " :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" 
                  :draggable="!key.includes('TEMPORARY')" @dragstart="dragStart" :class=" key.includes('TEMPORARY') ? 'taskCard' : 'draggableCursor taskCard' " ></task-card>
@@ -49,9 +50,9 @@ export default {
     	},
     	colPadding: function(){
     		if (this.colNames.length === 3){
-    			return "padding: 10px 50px;";
+    			return "padding: 0px 50px;";
     		} else {
-    			return "padding: 10px 30px;";
+    			return "padding: 0px 30px;";
     		}
     	},
     	colTasks: function(){

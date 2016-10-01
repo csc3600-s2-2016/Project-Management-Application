@@ -1,4 +1,20 @@
-
+<style>
+.disablePage {
+    height: 100vh;
+    margin: 0;
+    width: 100%;
+    z-index: 1600;
+    opacity: 0.4;
+    background-color: black;
+    cursor: not-allowed;
+    position: fixed;
+    display: inline-block;
+    left: 0;
+}
+#taskManagementApp {
+    margin-top: 10px;
+}
+</style>
 
 <template>
 <div>
@@ -145,11 +161,9 @@ export default {
                     }
                 }
 
-                var taskWithNewId = {};
-                var newId = "t" + jsonResponse.newID;
-                this.tasks[newId] = this.tasks[jsonResponse.tempID];
+                //change task id to reflect database
+                this.tasks[jsonResponse.newID] = this.tasks[jsonResponse.tempID];
                 delete this.tasks[jsonResponse.tempID];
-                this.tasks = Object.assign({}, this.tasks);
 
                 
             }, (response) => {
@@ -173,20 +187,20 @@ export default {
         'saveEditedTask' : function(task){
             this.tasks[task.id] = Object.assign({}, task.data);
             this.taskToEdit = {};
-            console.log({updateType: "editTask", task: task});  
+            console.log({updateType: "editTask", task: task});
             this.$http.post("/taskdata", {updateType: "editTask", task: task}, {'headers': {'Content-Type': 'application/json'}}).then((response) =>{
                 var subtaskIds = response.json();
-                //change subtask ids to reflect those in database
-                for (var tempid in subtaskIds){
-                    for (var i = 0; i<this.tasks[task.id].subtasks.length; i++ ){
-                        if(this.tasks[task.id].subtasks[i].tempID === tempid){
-                            this.tasks[task.id].subtasks[i].id = subtaskIds[tempid];
-                            delete this.tasks[task.id].subtasks[i].tempID;
-                            continue;
-                        }
+            //change subtask ids to reflect those in database
+            for (var tempid in subtaskIds){
+                for (var i = 0; i<this.tasks[task.id].subtasks.length; i++ ){
+                    if(this.tasks[task.id].subtasks[i].tempID === tempid){
+                        this.tasks[task.id].subtasks[i].id = subtaskIds[tempid];
+                        delete this.tasks[task.id].subtasks[i].tempID;
+                        continue;
                     }
                 }
-            }, (response) => {
+            }
+        }, (response) => {
                 console.log("Failed to send data to server");
             });
         },
@@ -195,8 +209,6 @@ export default {
             
         },
         'changeTaskStatus': function(statusData){
-            // this.tasks[newId] = this.tasks[jsonResponse.tempID];
-            // delete this.tasks[jsonResponse.tempID];
             this.tasks = Object.assign({}, this.tasks);
             this.sendToServer( {'updateType':'changeTaskStatus','statusData': statusData} );
         },
@@ -216,122 +228,121 @@ export default {
             this.tasks = Object.assign({}, this.tasks);
         }
     },
-    ready: function(){
+    ready: function() {
 
         //load project from server
         this.$http.get('/taskdata').then((response) => {
             var tasks = this.processIncomingTasksData(response.json().tasks);
-                this.tasks = Object.assign({}, this.tasks, tasks);
+            this.tasks = Object.assign({}, this.tasks, tasks);
             this.users = (response.json().users);
             this.currentUser = (response.json().currentUser);
-            toastr.success("Project loaded :)");
+            toastr.success("Project loaded.");
         }, (response) =>{
             toast.error("Error loading tasks from server!");
         });
-
         var vm = this;
         //setup websocket for future incoming data
-        socket.on("connect", function(){
+        socket.on("connect", function () {
             vm.disconnectedFromServer = false;
             socket.emit('authenticate', vm.getCookie('socketKey'));
         });
-        socket.on("reconnect", function(){
+        socket.on("reconnect", function () {
             vm.disconnectedFromServer = false;
             toastr.options.timeOut = 6000;
             toastr.remove();
             toastr.success("Connection to server re-established");
         });
-        socket.on("disconnect", function(){
+        socket.on("disconnect", function () {
             vm.disconnectedFromServer = true;
             toastr.remove();
             toastr.options.timeOut = 0;
             toastr.warning("Trying to reconnect...", "Disconnected from server!");
         });
-        socket.on('userOnline', function(userID){
-            toastr.info("User " + userID + " is online.");
+        socket.on('userOnline', function (username) {
+            toastr.info(username + " is online.");
         });
-        socket.on('newTask', function(sentStuff){
-            if (sentStuff.updatedBy !== vm.currentUser){
+        socket.on('newTask', function (sentStuff) {
+            if (sentStuff.updatedBy !== vm.currentUser) {
                 toastr.info(sentStuff.message);
                 var task = {};
                 task[sentStuff.data.id] = sentStuff.data.newtask;
                 vm.tasks = Object.assign({}, vm.tasks, task);
             }
         });
-        socket.on('changeTaskStatus', function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
+        socket.on('changeTaskStatus', function (sentStuff) {
+            if (sentStuff.updatedBy !== vm.currentUser) {
                 toastr.info(sentStuff.message);
                 vm.tasks[sentStuff.data.statusData.taskid].status = sentStuff.data.statusData.newStatus;
-            // }
+            }
         });
-        socket.on('changeTaskPrioritys', function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
-                for (var i = 0; i<sentStuff.data.priorities.length; i++){
+        socket.on('changeTaskPrioritys', function (sentStuff) {
+            if (sentStuff.updatedBy !== vm.currentUser) {
+                for (var i = 0; i < sentStuff.data.priorities.length; i++) {
                     var taskID = sentStuff.data.priorities[i];
                     vm.tasks[taskID].priority = i;
-                }                
-            // }
+                }
+            }
         });
-        socket.on("completeSubtask", function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
+        socket.on("completeSubtask", function (sentStuff) {
+            if (sentStuff.updatedBy !== vm.currentUser) {
                 toastr.info(sentStuff.message);
                 var subtasks = vm.tasks["t" + sentStuff.data.data.taskId].subtasks;
                 for (var i = subtasks.length - 1; i >= 0; i--) {
-                    if (subtasks[i].id === sentStuff.data.data.subtaskId){
+                    if (subtasks[i].id === sentStuff.data.data.subtaskId) {
                         subtasks[i].complete = sentStuff.data.data.complete;
                         break;
                     }
                 }
-            // }
+            }
         });
-        socket.on("logTime", function(sentStuff){
-            if (sentStuff.updatedBy !== vm.currentUser){
+        socket.on("logTime", function (sentStuff) {
+            if (sentStuff.updatedBy !== vm.currentUser) {
                 toastr.info(sentStuff.message);
                 var log = sentStuff.data.logData.log;
                 log.startDateTime = new Date(log.startDateTime);
                 log.user = log.user.id;
                 var history = vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory;
-                if (Array.isArray(history)){
+                if (Array.isArray(history)) {
                     vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory.push(log);
                 } else {
-                    vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory = [ log ];
+                    vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory = [log];
                 }
             }
         });
-        socket.on("updateSubtaskPriorites", function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
+        socket.on("updateSubtaskPriorites", function (sentStuff) {
+            if (sentStuff.updatedBy !== vm.currentUser) {
                 toastr.info(sentStuff.message);
                 var taskToUpdate = vm.tasks[sentStuff.data.subtaskPriorityData.taskId];
-                for (var id in sentStuff.data.subtaskPriorityData.subtasks){
-                    for (var i = 0; i< taskToUpdate.subtasks.length; i++){
-                        if (taskToUpdate.subtasks[i].id == id){
+                for (var id in sentStuff.data.subtaskPriorityData.subtasks) {
+                    for (var i = 0; i < taskToUpdate.subtasks.length; i++) {
+                        if (taskToUpdate.subtasks[i].id == id) {
                             vm.tasks[sentStuff.data.subtaskPriorityData.taskId].subtasks[i].priority = sentStuff.data.subtaskPriorityData.subtasks[id];
                         } else {
 
                         }
                     }
-                    
+
                 }
-                vm.tasks[sentStuff.data.subtaskPriorityData.taskId].subtasks.sort(function(a, b){
+                vm.tasks[sentStuff.data.subtaskPriorityData.taskId].subtasks.sort(function (a, b) {
                     return a.priority - b.priority;
                 })
-            // }
-        });
-        socket.on("archiveTask", function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
-                toastr.info(sentStuff.message);
-                delete vm.tasks[sentStuff.taskId];
-                vm.tasks = Object.assign({}, vm.tasks);
-            //}
-        });
-        socket.on("editTask", function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
-                toastr.info(sentStuff.message);
-                console.log(sentStuff);
-                //vm.tasks[sentStuff.data.task.id] = Object.assign({}, sentStuff.data.task.data);
-            //}
+            }
         });
 
-    },
+        socket.on("archiveTask", function (sentStuff) {
+            // if (sentStuff.updatedBy !== vm.currentUser){
+            toastr.info(sentStuff.message);
+            delete vm.tasks[sentStuff.taskId];
+            vm.tasks = Object.assign({}, vm.tasks);
+            //}
+        });
+        socket.on("editTask", function (sentStuff) {
+            // if (sentStuff.updatedBy !== vm.currentUser){
+            toastr.info(sentStuff.message);
+            console.log(sentStuff);
+            //vm.tasks[sentStuff.data.task.id] = Object.assign({}, sentStuff.data.task.data);
+            //}
+        });
+    }
 }
 </script>

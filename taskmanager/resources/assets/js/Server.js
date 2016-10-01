@@ -24,7 +24,7 @@ io.on('connection', function(socket){
 					socket.auth = true;
 					console.log("Joining socket " + socket.id + " to project room: " + sessionData.project);
 					socket.join(sessionData.project);
-					io.to(sessionData.project).emit('userOnline', sessionData.user_id);
+					io.to(sessionData.project).emit('userOnline', sessionData.userName);
 				}
 			}
 		});
@@ -39,7 +39,6 @@ io.on('connection', function(socket){
 	    }
 	 }, 1000);
 
-	
 	
 });
 
