@@ -17,6 +17,9 @@
     left: 0;
     top: $navbar-height;
 }
+#taskManagementApp {
+    margin-top: 10px;
+}
 .label-username{
 	@extend .label-info;
 	font-weight: 200;

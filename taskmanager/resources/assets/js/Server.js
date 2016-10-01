@@ -1,4 +1,3 @@
-
 var server = require('http').Server();
 var io = require('socket.io')(server);
 var Redis = require('ioredis');
@@ -24,7 +23,7 @@ io.on('connection', function(socket){
 					socket.auth = true;
 					console.log("Joining socket " + socket.id + " to project room: " + sessionData.project);
 					socket.join(sessionData.project);
-					io.to(sessionData.project).emit('userOnline', sessionData.userName);
+					io.to(sessionData.project).emit('userOnline', sessionData.user);
 				}
 			}
 		});
@@ -39,6 +38,7 @@ io.on('connection', function(socket){
 	    }
 	 }, 1000);
 
+	
 	
 });
 

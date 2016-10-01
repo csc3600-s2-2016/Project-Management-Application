@@ -8,23 +8,13 @@ use App\User;
 use App\Task;
 use App\Subtask;
 use App\LoggedTime;
-use App\UsersTask;
 use App\Http\Requests;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Redis;
 
 class taskController extends Controller
 {
-	/**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+	
 
     public function store(){
     	return view('tasks');
@@ -35,17 +25,23 @@ class taskController extends Controller
     *       - generates key to authenticate user for websocket subscription
     */
     public function index(){
+        //put some dummy data in session for testing
+        session(["project" => "testProject"]);
         //for testing
-        $redisdata = (['project' => 'testProject', 'userId'=>Auth::user()->id, 'userName'=>Auth::user()->display_name ]);   //for testing!!
+        $redisdata = (["project" => session("project")]);
+        $redisdata["user"] = (["id"=>"u" . Auth::user()->id, "name"=>Auth::user()->display_name ]);   //for testing!!
 
         //generate key for websocket authentication.
         $socketKey = $this->keygen();
         Redis::setEx(  $socketKey, 6000, json_encode( $redisdata )    );
 
 
+
+
         //return the tasks page with the websocket key as cookie
         return response()
             ->view('tasks')
+            ->cookie('uid', "u" . Auth::user()->id, 10, null, null, false, false)
             ->cookie('socketKey', $socketKey, 10, null, null, false, false);
     }
 
@@ -55,7 +51,11 @@ class taskController extends Controller
      */
     public function getAll(){
     	$projectData = new ProjectData();
-    	foreach (\App\Task::where('archived',false)->get() as $task) {
+        $tasks = \App\Task::where([
+            ['project', '=', session("project")],
+            ['archived', '=' , 0]
+            ])->get();
+    	foreach ($tasks as $task) {
     		$taskJSON = new TaskJSON();
     		$taskJSON->name = $task->name;
     		$taskJSON->description = $task->description;
@@ -69,20 +69,20 @@ class taskController extends Controller
        		foreach ($task->loggedTimes->sortBy('start_date_time') as $loggedTime) {
        			array_push($taskJSON->loggedTimeHistory, $loggedTime);
        		}
-       		foreach ($task->users as $assignedUser) {
-	       		array_push($taskJSON->assignedUsers, ("u".$assignedUser->id));        //  FIX THIS
+       		foreach ($task->users as $userTask) {
+	       		array_push($taskJSON->assignedUsers, "u".($userTask->id));
 	       	}
        		$projectData->tasks["t".$task->id] = $taskJSON;
     	}
 
 
-    	foreach (\App\User::all() as $user) {
+    	foreach (\App\User::all() as $user) {                          //todo:  Only get project users!
     		$userJSON = new UserJSON;
-    		$userJSON->id = "u" . $user->id;
+    		$userJSON->id = "u".$user->id;
     		$userJSON->displayName = $user->display_name;
     		$projectData->users["u" . $user->id] = $userJSON;
     	}
-        $projectData->currentUser = Auth::user()->display_name;  //for testing purposes!!
+        $projectData->currentUser = "u" . Auth::user()->id;
 
 
     	return json_encode($projectData);
@@ -197,6 +197,7 @@ class UpdatedData {
         $dueDate = $request->input('newtask.dueDate');
         $task->due_date = $dueDate ? date_create($dueDate) : null;
         $task->created_by = $this->updatedBy;
+        $task->project = session('project');
         $task->save();
         $subtasks = $request->input('newtask.subtasks');
         $subtaskIds = array();
@@ -220,9 +221,9 @@ class UpdatedData {
         }
 
 
-        $this->response = json_encode(['newID' => $task->id, 'tempID' => $request->input('tempID'), 'subtaskIds' => $subtaskIds]);
+        $this->response = json_encode(['newID' => "t".$task->id, 'tempID' => $request->input('tempID'), 'subtaskIds' => $subtaskIds]);
         // $this->response->header('Content-Type', 'application/json');
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message .= "$usersDisplayName created a new task:\n $task->name";
         $this->notification->project = $this->project;
         $this->notification->data = $request->all();
@@ -231,10 +232,6 @@ class UpdatedData {
         $this->notification->updateType = $this->updateType;
         $this->notification->shouldBroadcast = true;
     }
-
-
-
-
 
     public function editTask($req){
         $taskId = $req->input("task.id");
@@ -316,7 +313,7 @@ class UpdatedData {
 
 
         $this->response = json_encode($newSubtaskIdsToSendToClient);
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message .= "$usersDisplayName modified task:\n $task->name";
         $this->notification->project = $this->project;
         $this->notification->data = $req->all();
@@ -325,12 +322,6 @@ class UpdatedData {
         $this->notification->shouldBroadcast = true;
 
     }
-
-    
-
-
-
-
 
     private function changeTaskPrioritys($request){
         $priorities = $request->input('priorities');
@@ -358,7 +349,7 @@ class UpdatedData {
         $task = Task::find($taskid);
         $task->status = $statusData['newStatus'];
         $task->save();
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message = "$usersDisplayName moved task from \"" . $statusData['oldStatus'] . "\" to \"" . $statusData['newStatus'] . "\".";
         $this->notification->project = $this->project;
         $this->notification->data = $request->all();
@@ -373,7 +364,7 @@ class UpdatedData {
         $subtask->complete = $request->input('data.complete');
         $subtask->save();
         $completionAction = $request->input('data.complete') ? "completed" : "un-completed";
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message = "$usersDisplayName $completionAction subtask \"$subtask->name\" from the task \"";
         $this->notification->message .= Task::find($request->input('data.taskId'))->name . "\"";
         $this->notification->project = $this->project;
@@ -396,7 +387,7 @@ class UpdatedData {
         $task->loggedTimes()->save($loggedTime);
         $this->response = json_encode(['logId' => $loggedTime->id, 'tempLogId' => '']); //todo:  save id in front end
 
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message = "$usersDisplayName logged time for the task \"$task->name\"";
         $this->notification->project = $this->project;
         $this->notification->data = $req->all();
@@ -418,7 +409,7 @@ class UpdatedData {
             $subtask->save();
         }
 
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message = "$usersDisplayName re-ordered subtasks for \"$task->name\"";
         $this->notification->project = $this->project;
         $this->notification->data = $req->all();
@@ -436,7 +427,7 @@ class UpdatedData {
         $task->archived = true;
         $task->save();
 
-        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
         $this->notification->message = "$usersDisplayName archived task, \"$task->name\"";
         $this->notification->project = $this->project;
         $this->notification->data = $req->all();
@@ -444,7 +435,6 @@ class UpdatedData {
         $this->notification->updateType = $this->updateType;
         $this->notification->shouldBroadcast = true;
     }
-
 
     private function performUpdate($req){
         switch ($this->updateType) {

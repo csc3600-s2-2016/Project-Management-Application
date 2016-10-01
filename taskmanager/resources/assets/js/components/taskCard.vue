@@ -103,7 +103,6 @@ export default {
         },
         timeSummary: function(){
             var summary = '';
-            console.log(this.task.timeLogged);
             if (this.task.timeLogged){
                 summary += this.task.timeLogged + "/";
             }
@@ -167,13 +166,25 @@ export default {
         },
         'recalculateTimeLogged' : function(msg){
             if (!this.task.loggedTimeHistory){
-                return 0;
+                return parseFloat(0);
             }
-            var time = 0;
+            var time = parseFloat(0);
             for(var i = 0; i<this.task.loggedTimeHistory.length;i++){
-                time += parseInt(this.task.loggedTimeHistory[i].timeLogged);
+                time += parseFloat(this.task.loggedTimeHistory[i].timeLogged);
             }
-            this.task.timeLogged = time;
+            
+            if (time % 1 === 0){
+                this.task.timeLogged = time.toFixed();
+            } else if (time % 0.5 === 0){
+                this.task.timeLogged = time.toFixed(1);
+            } else {
+                this.task.timeLogged = time.toFixed(2);
+            }
+        }
+    },
+    watch: {
+        "task.loggedTimeHistory" : function(val, oldVal){
+            this.$emit('recalculateTimeLogged');
         }
     },
     ready: function(){

@@ -1,21 +1,3 @@
-<style>
-.disablePage {
-    height: 100vh;
-    margin: 0;
-    width: 100%;
-    z-index: 1600;
-    opacity: 0.4;
-    background-color: black;
-    cursor: not-allowed;
-    position: fixed;
-    display: inline-block;
-    left: 0;
-}
-#taskManagementApp {
-    margin-top: 10px;
-}
-</style>
-
 <template>
 <div>
     <div :class="disconnectedFromServer ? 'disablePage' : '' "></div>
@@ -31,7 +13,6 @@
 
 <script>
 var io = require('socket.io-client');
-var socket = io('http://192.168.33.10:3000');
 import NewTaskModal from './newTaskModal.vue';
 import TaskColumn from './taskColumn.vue';
 import EditTaskModal from './editTaskModal.vue';
@@ -162,8 +143,11 @@ export default {
                 }
 
                 //change task id to reflect database
-                this.tasks[jsonResponse.newID] = this.tasks[jsonResponse.tempID];
+                var taskWithNewId = {};
+                var newId = jsonResponse.newID;
+                this.tasks[newId] = this.tasks[jsonResponse.tempID];
                 delete this.tasks[jsonResponse.tempID];
+                this.tasks = Object.assign({}, this.tasks);
 
                 
             }, (response) => {
@@ -229,6 +213,9 @@ export default {
         }
     },
     ready: function() {
+        this.currentUser = this.getCookie('uid');
+        var socket = io('http://192.168.33.10:3000');
+
 
         //load project from server
         this.$http.get('/taskdata').then((response) => {
@@ -240,11 +227,13 @@ export default {
         }, (response) =>{
             toast.error("Error loading tasks from server!");
         });
-        var vm = this;
+       
+
         //setup websocket for future incoming data
+        var vm = this;
         socket.on("connect", function () {
-            vm.disconnectedFromServer = false;
-            socket.emit('authenticate', vm.getCookie('socketKey'));
+                vm.disconnectedFromServer = false;
+                socket.emit('authenticate', vm.getCookie('socketKey'));
         });
         socket.on("reconnect", function () {
             vm.disconnectedFromServer = false;
@@ -258,14 +247,18 @@ export default {
             toastr.options.timeOut = 0;
             toastr.warning("Trying to reconnect...", "Disconnected from server!");
         });
-        socket.on('userOnline', function (username) {
-            toastr.info(username + " is online.");
+        socket.on('userOnline', function (user) {
+            if (user.id !== vm.currentUser) {
+                toastr.info(user.name + " is online.");
+            }
         });
         socket.on('newTask', function (sentStuff) {
             if (sentStuff.updatedBy !== vm.currentUser) {
                 toastr.info(sentStuff.message);
                 var task = {};
+
                 task[sentStuff.data.id] = sentStuff.data.newtask;
+                task[sentStuff.data.id].dueDate = new Date(task[sentStuff.data.id].dueDate);
                 vm.tasks = Object.assign({}, vm.tasks, task);
             }
         });
@@ -328,20 +321,22 @@ export default {
                 })
             }
         });
-
         socket.on("archiveTask", function (sentStuff) {
-            // if (sentStuff.updatedBy !== vm.currentUser){
-            toastr.info(sentStuff.message);
-            delete vm.tasks[sentStuff.taskId];
-            vm.tasks = Object.assign({}, vm.tasks);
-            //}
+            if (sentStuff.updatedBy !== vm.currentUser){
+                toastr.info(sentStuff.message);
+                delete vm.tasks[sentStuff.data.taskId];
+                vm.tasks = Object.assign({}, vm.tasks);
+            }
         });
         socket.on("editTask", function (sentStuff) {
-            // if (sentStuff.updatedBy !== vm.currentUser){
-            toastr.info(sentStuff.message);
-            console.log(sentStuff);
-            //vm.tasks[sentStuff.data.task.id] = Object.assign({}, sentStuff.data.task.data);
-            //}
+            if (sentStuff.updatedBy !== vm.currentUser){
+                toastr.info(sentStuff.message);
+                console.log(sentStuff);
+                vm.tasks[sentStuff.data.task.id] =  sentStuff.data.task.data;
+                var dueDate = vm.tasks[sentStuff.data.task.id].dueDate;
+                vm.tasks[sentStuff.data.task.id].dueDate =  dueDate ? new Date(vm.tasks[sentStuff.data.task.id].dueDate) : null;
+                vm.tasks = Object.assign({}, vm.tasks);
+            }
         });
     }
 }

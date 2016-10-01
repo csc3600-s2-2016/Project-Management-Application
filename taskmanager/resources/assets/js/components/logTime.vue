@@ -123,7 +123,7 @@ export default {
             var log = {
                 'startDateTime': this.startTimeObject, 
                 'timeLogged': this.timeLogged, 
-                'user' : this.users[this.currentUser],
+                'user' : this.users[this.currentUser].id,
                 'notes': this.notes
             };
             var dataPackageForServer = {
