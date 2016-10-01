@@ -12,12 +12,12 @@
         </h4>
 
 
-        <template v-for="subtask in subtasks" track-by="priority">
+        <template v-for="subtask in subtasks" :key="subtask.priority">
             <div class="form-group"  style="margin:0px;">
                     <div class="input-group">
                         <input v-model="subtask.name" type="text" class="form-control" placeholder="Subtask name">
                         <div class="input-group-addon">
-                            <span class="btn btn-primary btn-xs btn-raised" v-on:click="removeSubtask(subtask.priority)" data-toggle="tooltip" data-placement="bottom" title="Remove subtask">&times;</span>
+                            <span class="btn btn-primary btn-xs btn-raised" v-on:click="removeSubtask($index)" data-toggle="tooltip" data-placement="bottom" title="Remove subtask">&times;</span>
                         </div>
                     </div>
                 </div>
@@ -48,18 +48,18 @@ export default {
                 nextIndex = 0;
             }
 
-            var subtask = {'priority': nextIndex, 'name' : '', 'complete': false,};
+            var subtask = {'priority': nextIndex, 'name' : '', 'complete': false, 'tempID': this.randomID()};
             this.subtasks.push(subtask);
+            this.subtasks = this.subtasks.slice();
         },
         removeSubtask: function(index){
-            var subtasks = new Array();
-            var priority = 0;
+            this.subtasks.splice(index, 1);
+            this.subtasks = this.subtasks.slice();
+            //redo priorities
             for (var i = 0; i<this.subtasks.length; i++){
-                if (i !== index){
-                    subtasks.push( {'priority': priority++, 'name' : this.subtasks[i].name, 'complete': false} );
-                }
+                this.subtasks[i].priority = i;
             }
-            this.subtasks = subtasks;
+            this.subtasks = this.subtasks.slice();
 
         },
         randomID: function(){
@@ -75,20 +75,18 @@ export default {
      events: {
         'savingTask': function(removeEmptySubtasks){
             if (!this.subtasks){
+                this.subtasks = [];
                 return;
             }
 
-            var subtasks = new Array();
             var priority = 0;
             for (var i = 0; i<this.subtasks.length; i++){
                 if (this.subtasks[i].name.trim().length > 0){
-                    subtasks.push( {'priority': priority++, 'name' : this.subtasks[i].name, 'complete': false,  "tempID": this.randomID()} );
+                    this.subtasks[i].priority = priority++;
+                } else {
+                    this.subtasks.splice(i, 1);  //remove subtasks with empty name
                 }
             }
-            if (subtasks.length === 0){
-                subtasks = ''; 
-            }
-            this.subtasks = subtasks;
         } 
      }
 }

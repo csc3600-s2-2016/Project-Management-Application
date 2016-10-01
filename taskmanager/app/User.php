@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+
     // public function Tasks()
     // {
     //     return $this->hasMany('App\Task');
@@ -33,6 +34,6 @@ class User extends Authenticatable
         return $this->hasMany(LoggedTime::class);
     }
     public function tasks(){
-        return $this->hasMany(Task::class);
+        return $this->belongsToMany(Task::class, 'usersTasks', "user_id", "task_id");
     }
 }

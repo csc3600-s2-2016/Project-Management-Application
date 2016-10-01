@@ -30,7 +30,10 @@
                             <i class="fa fa-clock-o taskMenuIcon" aria-hidden="true"></i> Log Time
                         </a>
                     </li>
-                    <li><a @click="editTask"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
+                    <li v-show="!id.includes('TEMPORARY')"><a @click="editTask"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
+
+                    <li v-show="!id.includes('TEMPORARY')" role="separator" class="divider"></li>
+                    <li v-show="!id.includes('TEMPORARY')"><a @click="archiveTask"><i class="fa fa-archive taskMenuIcon" aria-hidden="true"></i> Archive</a></li>
                 </ul>
             </div>
         </div>
@@ -149,6 +152,9 @@ export default {
         },
         editTask: function(){
             this.$dispatch('editTask', this.id);
+        },
+        archiveTask: function(){
+            this.$dispatch('archiveTask', this.id);
         }
     },
     components: {

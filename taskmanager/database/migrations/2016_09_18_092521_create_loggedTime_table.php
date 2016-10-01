@@ -19,9 +19,9 @@ class CreateLoggedTimeTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->dateTime('start_date_time');
-            $table->smallInteger('time_logged');
+            $table->smallInteger('time_logged');        //change to type decimal (4,2) in next migration
             $table->text('notes');
-            $table->timestamps();
+            $table->nullableTimestamps();
         });
     }
 

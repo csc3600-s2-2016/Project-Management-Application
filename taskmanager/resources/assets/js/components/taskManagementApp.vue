@@ -1,17 +1,4 @@
-<style>
-.disablePage {
-    height: 100vh;
-    margin: 0;
-    width: 100%;
-    z-index: 1600;
-    opacity: 0.4;
-    background-color: black;
-    cursor: not-allowed;
-    position: fixed;
-    display: inline-block;
-    left: 0;
-}
-</style>
+
 
 <template>
 <div>
@@ -158,9 +145,11 @@ export default {
                     }
                 }
 
-                //change task id to reflect database
-                this.tasks[jsonResponse.newID] = this.tasks[jsonResponse.tempID];
+                var taskWithNewId = {};
+                var newId = "t" + jsonResponse.newID;
+                this.tasks[newId] = this.tasks[jsonResponse.tempID];
                 delete this.tasks[jsonResponse.tempID];
+                this.tasks = Object.assign({}, this.tasks);
 
                 
             }, (response) => {
@@ -171,18 +160,44 @@ export default {
             this.taskToEdit = {'id': taskId, 'data': jQuery.extend({}, this.tasks[taskId])};
             if ( ! Array.isArray(this.taskToEdit.data.subtasks)){
                 this.taskToEdit.data.subtasks = new Array();
+            } else {
+                this.taskToEdit.data.subtasks = this.taskToEdit.data.subtasks.slice();
+            }
+            if ( ! Array.isArray(this.taskToEdit.data.assignedUsers)){
+                this.taskToEdit.data.assignedUsers = new Array();
+            } else {
+                this.taskToEdit.data.assignedUsers = this.taskToEdit.data.assignedUsers.slice();
             }
             jQuery('#editTaskModal').modal('show');
         },
-        'saveTask' : function(task){
+        'saveEditedTask' : function(task){
             this.tasks[task.id] = Object.assign({}, task.data);
             this.taskToEdit = {};
+            console.log({updateType: "editTask", task: task});  
+            this.$http.post("/taskdata", {updateType: "editTask", task: task}, {'headers': {'Content-Type': 'application/json'}}).then((response) =>{
+                var subtaskIds = response.json();
+                //change subtask ids to reflect those in database
+                for (var tempid in subtaskIds){
+                    for (var i = 0; i<this.tasks[task.id].subtasks.length; i++ ){
+                        if(this.tasks[task.id].subtasks[i].tempID === tempid){
+                            this.tasks[task.id].subtasks[i].id = subtaskIds[tempid];
+                            delete this.tasks[task.id].subtasks[i].tempID;
+                            continue;
+                        }
+                    }
+                }
+            }, (response) => {
+                console.log("Failed to send data to server");
+            });
         },
         'prioritiesUpdated': function(priorities){
             this.sendToServer( {'updateType':'changeTaskPrioritys','priorities': priorities} );
             
         },
         'changeTaskStatus': function(statusData){
+            // this.tasks[newId] = this.tasks[jsonResponse.tempID];
+            // delete this.tasks[jsonResponse.tempID];
+            this.tasks = Object.assign({}, this.tasks);
             this.sendToServer( {'updateType':'changeTaskStatus','statusData': statusData} );
         },
         'completeSubtask': function(data){
@@ -194,6 +209,11 @@ export default {
         'updateSubtaskPriorites' : function(data){
             console.log(data);
             this.sendToServer({"updateType": "updateSubtaskPriorites", "subtaskPriorityData": data});
+        },
+        'archiveTask' : function(taskId){
+            this.sendToServer({"updateType": "archiveTask", "taskId": taskId});
+            delete this.tasks[taskId];
+            this.tasks = Object.assign({}, this.tasks);
         }
     },
     ready: function(){
@@ -201,7 +221,7 @@ export default {
         //load project from server
         this.$http.get('/taskdata').then((response) => {
             var tasks = this.processIncomingTasksData(response.json().tasks);
-            this.tasks = Object.assign({}, this.tasks, tasks);
+                this.tasks = Object.assign({}, this.tasks, tasks);
             this.users = (response.json().users);
             this.currentUser = (response.json().currentUser);
             toastr.success("Project loaded :)");
@@ -217,11 +237,15 @@ export default {
         });
         socket.on("reconnect", function(){
             vm.disconnectedFromServer = false;
+            toastr.options.timeOut = 6000;
+            toastr.remove();
             toastr.success("Connection to server re-established");
         });
         socket.on("disconnect", function(){
             vm.disconnectedFromServer = true;
-            toastr.warning("Disconnected from server");
+            toastr.remove();
+            toastr.options.timeOut = 0;
+            toastr.warning("Trying to reconnect...", "Disconnected from server!");
         });
         socket.on('userOnline', function(userID){
             toastr.info("User " + userID + " is online.");
@@ -261,7 +285,7 @@ export default {
             // }
         });
         socket.on("logTime", function(sentStuff){
-            // if (sentStuff.updatedBy !== vm.currentUser){
+            if (sentStuff.updatedBy !== vm.currentUser){
                 toastr.info(sentStuff.message);
                 var log = sentStuff.data.logData.log;
                 log.startDateTime = new Date(log.startDateTime);
@@ -272,7 +296,7 @@ export default {
                 } else {
                     vm.tasks[sentStuff.data.logData.taskId].loggedTimeHistory = [ log ];
                 }
-            // }
+            }
         });
         socket.on("updateSubtaskPriorites", function(sentStuff){
             // if (sentStuff.updatedBy !== vm.currentUser){
@@ -293,7 +317,20 @@ export default {
                 })
             // }
         });
-
+        socket.on("archiveTask", function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                toastr.info(sentStuff.message);
+                delete vm.tasks[sentStuff.taskId];
+                vm.tasks = Object.assign({}, vm.tasks);
+            //}
+        });
+        socket.on("editTask", function(sentStuff){
+            // if (sentStuff.updatedBy !== vm.currentUser){
+                toastr.info(sentStuff.message);
+                console.log(sentStuff);
+                //vm.tasks[sentStuff.data.task.id] = Object.assign({}, sentStuff.data.task.data);
+            //}
+        });
 
     },
 }

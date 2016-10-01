@@ -16,12 +16,15 @@ class CreateTasksTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->tinyInteger('status')->unsigned();
+            $table->smallInteger('status')->unsigned();
             $table->integer('priority')->unsigned();
             $table->integer('time_estimated')->unsigned()->nullable();
             $table->date('due_date')->nullable();
             $table->integer('created_by')->unsigned();
-            $table->timestamps();
+            $table->nullableTimestamps();
+
+            //On next migration
+            //add columns: archived, project
         });
     }
 

@@ -12,12 +12,14 @@
 */
 use Illuminate\Support\Facades\Redis;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::auth();
+
+Route::get('/', 'HomeController@index');
 
 Route::get('/tasks', 'taskController@index' );
 
 Route::get('/taskdata', 'taskController@getAll');
 
 Route::post('/taskdata', 'taskController@updateProject');
+
+

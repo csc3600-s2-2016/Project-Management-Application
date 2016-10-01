@@ -32,26 +32,34 @@
             <a class="navbar-brand" href="#">{{ config('app.name') }}</a>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
+          
             <ul class="nav navbar-nav">
+              @if (Auth::guest())
+              @else
               <li class="active"><a href="#">Projects</a></li>
               <li><a href="#">Tasks</a></li>
               <li><a href="#">Review</a></li>
-              
+              <li><a data-toggle="modal" data-target="#newTaskModal">Create New Task</a></li>
+              @endif
             </ul>
+      
             <ul class="nav navbar-nav navbar-right">
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">MENU <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                  <li><a data-toggle="modal" data-target="#newTaskModal">Create New Task</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li role="separator" class="divider"></li>
-                  <li class="dropdown-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
+                    <!-- Authentication Links -->
+                    @if (Auth::guest())
+                        <li><a href="{{ url('/login') }}">Login</a></li>
+                        <li><a href="{{ url('/register') }}">Register</a></li>
+                    @else
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ Auth::user()->name }} <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    @endif
                 </ul>
-              </li>
-            </ul>
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
       </nav>

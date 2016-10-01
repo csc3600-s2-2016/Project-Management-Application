@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class Task extends Model
 {
@@ -11,12 +13,13 @@ class Task extends Model
     	return $this->hasMany(Subtask::class, 'task');
     } 
     public function users(){
-    	return $this->hasMany(UsersTask::class, 'task_id');
+    	return $this->belongsToMany(User::class, 'usersTasks', "task_id", "user_id")->withTimestamps();
     }
-    // public function users(){
-    // 	return $this->hasManyThrough(User::class, UsersTask::class, 'user_id', 'id', 'task_id');
-    // }
     public function loggedTimes(){
     	return $this->hasMany(LoggedTime::class, 'task');
+    }
+
+    public function setDueDateAttribute($value){
+        $this->attributes['due_date'] = empty($value) ? null : $value;
     }
 }

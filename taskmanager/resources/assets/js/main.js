@@ -28,6 +28,8 @@ toastr.options.preventDuplicates = true;
 toastr.options.positionClass = 'toast-bottom-left';
 toastr.options.timeOut = 6000;
 
+
+
 var taskApp = new Vue({
   el: 'body',
   ready: function(){

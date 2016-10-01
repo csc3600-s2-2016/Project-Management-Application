@@ -111,7 +111,7 @@ export default {
                 return;
             }
             this.$broadcast('savingTask', 'removeEmptySubtasks');
-            this.$dispatch('saveTask', this.task);
+            this.$dispatch('saveEditedTask', this.task);
             this.close();
         },
         close: function(){

@@ -134,7 +134,7 @@
             <td class="text-right" style="min-width:100px;">{{getStartDate(log.startDateTime)}}</td>
             <td class="text-right" style="min-width:100px;">{{getStartTime(log.startDateTime)}}</td>
             <td class="text-right" style="min-width:100px;">{{log.timeLogged}}</td>
-            <td style="min-width:120px;">{{users[log.user].displayName}}</td>
+            <td style="min-width:120px;">{{users[log.user.id].displayName}}</td> <!-- fix this! database sends log.user.id, front end creates log.user -->
             <td>{{log.notes}}</td>
           </tr>
         </tbody>

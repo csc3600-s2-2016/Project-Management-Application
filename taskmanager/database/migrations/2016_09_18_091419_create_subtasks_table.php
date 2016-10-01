@@ -19,7 +19,7 @@ class CreateSubtasksTable extends Migration
             $table->string('name');
             $table->boolean('complete');
             $table->integer('priority');
-            $table->timestamps();
+            $table->nullableTimestamps();
         });
     }
 

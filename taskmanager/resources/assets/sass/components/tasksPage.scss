@@ -4,6 +4,19 @@
 #app{
 	margin-top:50px;
 }
+.disablePage {
+    height: 100vh;
+    margin: 0;
+    width: 100%;
+    z-index: 1600;
+    opacity: 0.4;
+    background-color: black;
+    cursor: not-allowed;
+    position: fixed;
+    display: inline-block;
+    left: 0;
+    top: $navbar-height;
+}
 .label-username{
 	@extend .label-info;
 	font-weight: 200;
@@ -35,6 +48,11 @@
 	cursor: grabbing;
 	cursor: -moz-grabbing;
 	cursor: -webkit-grabbing;
+}
+.draggableCursor {
+	cursor: grab;
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
 }
 .timeLoggedTable{
 	@extend p;
@@ -82,9 +100,6 @@
 .task-panel {
     max-width: 600px;
     margin: 0 auto 20px auto;
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
 }
 a:hover {
 	cursor: pointer;
@@ -101,4 +116,9 @@ a:hover {
 .ghostclass{
 	border: 1px solid $brand-primary;
     background-color: $green-50;
+}
+
+.remember-me {
+  transform: scale(0.8);
+  display: inline-block;
 }

@@ -7,8 +7,8 @@
 		</div>
         <div class="task-column" :style="colPadding" @dragover.prevent="dragOver" @drop="colDropZone">
 
-                <task-card v-for="(key, task) in colTasks | orderBy 'priority' " :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" 
-                 draggable="true" @dragstart="dragStart" class="taskCard"></task-card>
+                <task-card v-for="(key, task) in tasks | filterBy colID in 'status' | orderBy 'priority' " :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" 
+                 :draggable="!key.includes('TEMPORARY')" @dragstart="dragStart" :class=" key.includes('TEMPORARY') ? 'taskCard' : 'draggableCursor taskCard' " ></task-card>
 
         </div>
 	</div>

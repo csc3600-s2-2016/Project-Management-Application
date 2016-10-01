@@ -8,12 +8,22 @@ use App\User;
 use App\Task;
 use App\Subtask;
 use App\LoggedTime;
+use App\UsersTask;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Database\Eloquent\Collection;
 
 class taskController extends Controller
 {
-	
+	/**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     public function store(){
     	return view('tasks');
@@ -45,7 +55,7 @@ class taskController extends Controller
      */
     public function getAll(){
     	$projectData = new ProjectData();
-    	foreach (\App\Task::all() as $task) {
+    	foreach (\App\Task::where('archived',false)->get() as $task) {
     		$taskJSON = new TaskJSON();
     		$taskJSON->name = $task->name;
     		$taskJSON->description = $task->description;
@@ -59,8 +69,8 @@ class taskController extends Controller
        		foreach ($task->loggedTimes->sortBy('start_date_time') as $loggedTime) {
        			array_push($taskJSON->loggedTimeHistory, $loggedTime);
        		}
-       		foreach ($task->users as $userTask) {
-	       		array_push($taskJSON->assignedUsers, "u".($userTask->user_id));
+       		foreach ($task->users as $assignedUser) {
+	       		array_push($taskJSON->assignedUsers, ("u".$assignedUser->id));        //  FIX THIS
 	       	}
        		$projectData->tasks["t".$task->id] = $taskJSON;
     	}
@@ -183,27 +193,37 @@ class UpdatedData {
         $task->description = $request->input('newtask.description');
         $task->status = $request->input('newtask.status');
         $task->priority = $request->input('newtask.priority');
-        $task->time_estimated = $request->input('newtask.timeEstimated');
-        $task->due_date = $request->input('newtask.dueDate');
+        $task->time_estimated = $request->input('newtask.timeEstimated') == 0 ? null : $request->input('newtask.timeEstimated');
+        $dueDate = $request->input('newtask.dueDate');
+        $task->due_date = $dueDate ? date_create($dueDate) : null;
         $task->created_by = $this->updatedBy;
         $task->save();
         $subtasks = $request->input('newtask.subtasks');
         $subtaskIds = array();
-        for ($i=0; $i < count($subtasks); $i++) { 
-            $subtask = new Subtask([
-                "name" => $subtasks[$i]['name'],
-                "priority" => $subtasks[$i]['priority'],
-                "complete" => $subtasks[$i]['complete']
-            ]);
-            $task->subtasks()->save($subtask);
-            $subtaskIds[$subtasks[$i]['tempID']] = $subtask->id;
+        if (! empty($subtasks)){
+            for ($i=0; $i < count($subtasks); $i++) { 
+                $subtask = new Subtask([
+                    "name" => $subtasks[$i]['name'],
+                    "priority" => $subtasks[$i]['priority'],
+                    "complete" => $subtasks[$i]['complete']
+                ]);
+                $task->subtasks()->save($subtask);
+                $subtaskIds[$subtasks[$i]['tempID']] = $subtask->id;
+            }
+        }
+        $assignedUsers = $request->input('newtask.assignedUsers');
+        for ($i=0; $i < count($assignedUsers); $i++) { 
+            $userId = $assignedUsers[$i];
+            $userId = substr_replace($userId, '', 0, 1);
+            $user = User::find($userId);
+            $task->users()->attach($user);
         }
 
 
         $this->response = json_encode(['newID' => $task->id, 'tempID' => $request->input('tempID'), 'subtaskIds' => $subtaskIds]);
         // $this->response->header('Content-Type', 'application/json');
         $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
-        $this->notification->message = "$usersDisplayName created a new task:\n $task->name";
+        $this->notification->message .= "$usersDisplayName created a new task:\n $task->name";
         $this->notification->project = $this->project;
         $this->notification->data = $request->all();
         $this->notification->updatedBy = "u".$this->updatedBy;
@@ -211,6 +231,106 @@ class UpdatedData {
         $this->notification->updateType = $this->updateType;
         $this->notification->shouldBroadcast = true;
     }
+
+
+
+
+
+    public function editTask($req){
+        $taskId = $req->input("task.id");
+        if (strpos($taskId, "t") == 0){
+            $taskId = substr_replace($taskId, '', 0, 1);
+        }
+        $task = Task::find($taskId);
+        $task->name = $req->input("task.data.name");
+        $task->description = $req->input("task.data.description");
+        $task->time_estimated = $req->input("task.data.timeEstimated") == 0 ? null : $req->input("task.data.timeEstimated");
+        $dueDate = $req->input('task.data.dueDate');
+        $task->due_date = $dueDate ? date_create($dueDate) : null;
+        $task->save();
+
+        $editedSubtasks = $req->input('task.data.subtasks');
+        $subtasksToKeep = array();
+        $newSubtaskIdsToSendToClient = array();
+
+        //update subtasks
+        if (! empty($editedSubtasks)){
+            for ($i=0; $i < count($editedSubtasks); $i++) { 
+                if( array_key_exists("tempID", $editedSubtasks[$i])){  //not yet saved to server
+                    $subtask = new Subtask([
+                        "name" => $editedSubtasks[$i]['name'],
+                        "priority" => $editedSubtasks[$i]['priority'],
+                        "complete" => $editedSubtasks[$i]['complete']
+                    ]);
+                    $task->subtasks()->save($subtask);
+                    $newSubtaskIdsToSendToClient[$editedSubtasks[$i]["tempID"]] = $subtask->id;
+                } else {                                                    //modify existing subtask
+                    $subtask = Subtask::find($editedSubtasks[$i]["id"]);
+                    $subtask->name  = $editedSubtasks[$i]['name'];
+                    $subtask->priority  =  $editedSubtasks[$i]['priority'];
+                    $subtask->complete  =  $editedSubtasks[$i]['complete'];
+                    $subtask->save();
+                }
+                array_push($subtasksToKeep, $subtask);
+            }
+        } 
+        foreach ($task->subtasks as $subtaskInDatabase) {
+            $deleteSubtask = true;
+            foreach ($subtasksToKeep as $keep) {
+                if ($subtaskInDatabase->id == $keep->id){
+                    $deleteSubtask = false;
+                }
+            }
+            if ($deleteSubtask){
+                $subtaskInDatabase->delete();
+            }
+        }
+
+
+        //update users
+        $listOfNewUserIds = $req->input('task.data.assignedUsers');
+        if (!empty($listOfNewUserIds)){
+            for ($i=0; $i < count($listOfNewUserIds); $i++) { 
+                $listOfNewUserIds[$i] = substr_replace($listOfNewUserIds[$i], '', 0, 1);
+            }
+        }
+
+        $newUsers = User::find($listOfNewUserIds);
+        $oldUsers = $task->users;
+
+
+        foreach ($newUsers as $newUser) {               //if newlist user is not in old list, attach
+            if (! $newUser->tasks->contains($task)){
+                $task->users()->attach($newUser);
+            }
+        }
+        foreach ($oldUsers as $oldUser) {               //if oldlist user is not in new list, detach
+            if (! $newUsers->contains("id", $oldUser->id)){
+                $task->users()->detach($oldUser);
+            }
+        };
+        
+        
+
+
+
+
+        $this->response = json_encode($newSubtaskIdsToSendToClient);
+        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $this->notification->message .= "$usersDisplayName modified task:\n $task->name";
+        $this->notification->project = $this->project;
+        $this->notification->data = $req->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+
+    }
+
+    
+
+
+
+
 
     private function changeTaskPrioritys($request){
         $priorities = $request->input('priorities');
@@ -311,6 +431,25 @@ class UpdatedData {
         $this->notification->shouldBroadcast = true;
     }
 
+    public function archiveTask($req){
+        $taskId = $req->input("taskId");
+        if (strpos($taskId, "t") == 0){
+            $taskId = substr_replace($taskId, '', 0, 1);
+        }
+        $task = Task::find($taskId);
+        $task->archived = true;
+        $task->save();
+
+        $usersDisplayName = User::find($this->updatedBy)->first()->display_name;
+        $this->notification->message = "$usersDisplayName archived task, \"$task->name\"";
+        $this->notification->project = $this->project;
+        $this->notification->data = $req->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
+
+
     private function performUpdate($req){
         switch ($this->updateType) {
             case "newTask":                 //still need to create userstasks database records for this action!
@@ -322,9 +461,9 @@ class UpdatedData {
             case "updateSubtaskPriorites":
                 $this->updateSubtaskPriorites($req);
                 break;
-            // case "editTask":
-            //     $this->editTask($req);
-            //     break;
+            case "editTask":
+                $this->editTask($req);
+                break;
             case "completeSubtask":
                 $this->completeSubtask($req);
                 break;
@@ -334,11 +473,11 @@ class UpdatedData {
             case "logTime":
                 $this->logTime($req);
                 break;
-            // case "archiveTask":                  //need to implement an archive task button and then only load un-archived tasks
-            //     $this->archiveTask($req);
-            //     break;
+            case "archiveTask":                  //need to implement an archive task button and then only load un-archived tasks
+                $this->archiveTask($req);
+                break;
             default:
-                $this->Response("Undefined update type. How the hell are me meant to process that?!", 400);
+                $this->response = Response("Undefined update type. How the hell are me meant to process that?!", 400);
         }
     }
 
