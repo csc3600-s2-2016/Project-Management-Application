@@ -16,7 +16,7 @@
                         <hr class="intro-divider">
                         <ul class="list-inline intro-social-buttons">
                             <li>
-                                <a href="#" class="btn btn-primary btn-lg btn-raised"><span class="network-name">Set up a project</span></a>
+                                <a href="/projects" class="btn btn-primary btn-lg btn-raised"><span class="network-name">Set up a project</span></a>
                             </li>
                            <!--  <li>
                                 <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><span class="network-name">Login</span></a>
@@ -152,7 +152,7 @@
                             <a href="#contact">Contact</a>
                         </li>
                     </ul>
-                    <p class="copyright text-muted small">Copyright &copy; Your Company 2014. All Rights Reserved</p>
+                    <p class="copyright text-muted small">Copyright &copy; USQ 2016. All Rights Reserved</p>
                 </div>
             </div>
         </div>

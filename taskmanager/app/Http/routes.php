@@ -16,6 +16,8 @@ Route::auth();
 
 Route::get('/', 'HomeController@index');
 
+Route::get('/projects', 'taskController@index');
+
 Route::get('/tasks', 'taskController@index' );
 
 Route::get('/taskdata', 'taskController@getAll');

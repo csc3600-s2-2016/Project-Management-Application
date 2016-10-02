@@ -29,24 +29,44 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">{{ config('app.name') }}</a>
+            <a class="navbar-brand" href="/">{{ config('app.name') }}</a>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
           
             <ul class="nav navbar-nav">
               @if (Auth::guest())
               @else
-              <li class="active"><a href="/projects">Projects</a></li>
-              <li><a href="/tasks">Tasks</a></li>
-              <li><a href="/review">Review</a></li>
+              <li 
+              @if (Request::is('project'))
+              { class="active" } 
+              @endif
+              ><a href="/projects">Projects</a></li>
+              <li
+              @if (Request::is('tasks'))
+              { class="active" } 
+              @endif
+              ><a href="/tasks">Tasks</a></li>
+              <li
+              @if (Request::is('review'))
+              { class="active" } 
+              @endif
+              ><a href="/review">Review</a></li>
               @endif
             </ul>
       
             <ul class="nav navbar-nav navbar-right">
                     <!-- Authentication Links -->
                     @if (Auth::guest())
-                        <li><a href="{{ url('/login') }}">Login</a></li>
-                        <li><a href="{{ url('/register') }}">Register</a></li>
+                        <li
+                        @if (Request::is('login'))
+                          { class="active" } 
+                        @endif
+                        ><a href="{{ url('/login') }}">Login</a></li>
+                        <li
+                        @if (Request::is('register'))
+                          { class="active" } 
+                        @endif
+                        ><a href="{{ url('/register') }}">Register</a></li>
                     @else
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
