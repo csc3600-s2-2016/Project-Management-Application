@@ -34,7 +34,7 @@ class taskController extends Controller
     */
     public function index(){
         //put some dummy data in session for testing
-        session(["project" => "testProject"]);
+        session(["project" => "1"]);
         //for testing
         if (Auth::check()) {
             $redisdata = (["project" => session("project")]);

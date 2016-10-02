@@ -13,8 +13,7 @@ class AddArchviedAndProjectColsToTasks extends Migration
     public function up()
     {
         Schema::table('tasks', function ($table) {
-            $table->string('project');
-            // $table->foreign('project')->references('id')->on('projects')->onDelete('cascade');
+            $table->integer('project')->unsigned();
             $table->boolean('archived');
 
         });

@@ -18,8 +18,12 @@ class Task extends Model
     public function loggedTimes(){
     	return $this->hasMany(LoggedTime::class, 'task');
     }
+    public function project(){
+        return $this->hasOne(Project::class, 'project');
+    }
 
     public function setDueDateAttribute($value){
         $this->attributes['due_date'] = empty($value) ? null : $value;
     }
+
 }
