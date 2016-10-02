@@ -9,3 +9,9 @@
 /nbproject
 csc3600.box
 /taskmanager/npm-debug.log*
+README.md
+scotchbox.local.conf
+.travis.yml
+.provisionVagrant.bash
+.env*
+

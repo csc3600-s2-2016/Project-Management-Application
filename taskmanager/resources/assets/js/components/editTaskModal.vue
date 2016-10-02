@@ -53,7 +53,7 @@
 <script>
 import DuedateCreator from './duedateCreator.vue';
 import EstimatedTimeCreator from './estimatedTimeCreator.vue';
-import AssignUsers from './AssignUsers.vue';
+import AssignUsers from './assignUsers.vue';
 import CreateSubtasks from './createSubtasks.vue';
 export default {
 	components: { 
