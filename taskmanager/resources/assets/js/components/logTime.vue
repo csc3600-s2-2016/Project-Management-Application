@@ -99,7 +99,7 @@ export default {
             var todaysDateString = today.getDate() + " ";
             todaysDateString += MONTHS[today.getMonth()] + ", " + today.getFullYear() + "  ";
             var hours = today.getHours() % 12;
-            todaysDateString += hours + ":" + today.getMinutes() + " ";
+            todaysDateString += hours + ":" + ("0" + today.getMinutes()).slice(-2) + " ";
             if (today.getHours() >= 12){
                 todaysDateString += "PM";
             } else {

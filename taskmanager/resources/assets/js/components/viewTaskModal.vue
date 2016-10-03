@@ -48,7 +48,7 @@
 
 
 
-      <div class="h4" v-show="task.subtasks">Subtasks:</div>
+      <div class="h4" v-show="task.subtasks && task.subtasks.length > 0">Subtasks:</div>
 
       <table style="width:100%;" v-sortable="subtaskSortableOptions">
         <tbody v-for="subtask in task.subtasks">
@@ -201,10 +201,13 @@ export default {
           }
       },
       modalSize: function(){
-        if (this.task.description || this.task.subtasks){
-          return "modal-lg";
-        }
-        return "";
+          if ( this.task.subtasks && this.task.subtasks.length >0){
+            return "modal-lg";
+          } else if ( this.task.loggedTimeHistory  && this.task.loggedTimeHistory.length >0){
+            return "modal-lg";
+          } else {
+            return "";
+          }
       },
       modalIsLarge: function(){
         return this.modalSize ? true : false;

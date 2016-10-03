@@ -36,7 +36,7 @@ io.on('connection', function(socket){
 	      console.log("Disconnecting socket ", socket.id);
 	      socket.disconnect('Could not authenticate');
 	    }
-	 }, 1000);
+	 }, 5000);
 
 	
 	

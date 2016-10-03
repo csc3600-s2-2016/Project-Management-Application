@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\User;
 use App\Task;
+use App\Project;
 use App\Subtask;
 use App\LoggedTime;
 use App\Http\Requests;
@@ -60,10 +61,19 @@ class taskController extends Controller
      */
     public function getAll(){
     	$projectData = new ProjectData();
+        $project = Project::find(session("project"));
+        $projectData->currentUser = "u" . Auth::user()->id;
         $tasks = \App\Task::where([
-            ['project', '=', session("project")],
+            ['project', '=', $project->id],
             ['archived', '=' , 0]
             ])->get();
+
+        $categories = ([$project->col1Name, $project->col2Name, $project->col3Name]);
+        if( ! empty($project->col4Name) ){
+            array_push($categories, $project->col4Name);
+        }
+        $projectData->categories = $categories;
+
     	foreach ($tasks as $task) {
     		$taskJSON = new TaskJSON();
     		$taskJSON->name = $task->name;
@@ -85,13 +95,12 @@ class taskController extends Controller
     	}
 
 
-    	foreach (\App\User::all() as $user) {                          //todo:  Only get project users!
+    	foreach ($project->users as $user) {
     		$userJSON = new UserJSON;
     		$userJSON->id = "u".$user->id;
     		$userJSON->displayName = $user->display_name;
     		$projectData->users["u" . $user->id] = $userJSON;
     	}
-        $projectData->currentUser = "u" . Auth::user()->id;
 
 
     	return json_encode($projectData);
@@ -165,6 +174,7 @@ class ProjectData {
 	public $tasks = array();
 	public $users = array();
 	public $currentUser = "";
+    public $categories = array();
 }
 
 class Notification {
@@ -353,13 +363,21 @@ class UpdatedData {
     }
 
     private function changeTaskStatus($request){
+        $project = Project::find(session("project"));
         $statusData = $request->input('statusData');
         $taskid = substr_replace($statusData['taskid'], '', 0, 1);
         $task = Task::find($taskid);
         $task->status = $statusData['newStatus'];
         $task->save();
+        $taskCategoryHeadings = ([$project->col1Name, $project->col2Name, $project->col3Name, $project->col4Name]);
+        $oldColName = $taskCategoryHeadings[$statusData['oldStatus']];
+        $newColName = $taskCategoryHeadings[$statusData['newStatus']];
         $usersDisplayName = User::find($this->updatedBy)->display_name;
-        $this->notification->message = "$usersDisplayName moved task from \"" . $statusData['oldStatus'] . "\" to \"" . $statusData['newStatus'] . "\".";
+        if ($statusData['oldStatus'] == $statusData['newStatus']){
+            $this->notification->message = "$usersDisplayName re-ordered tasks in \"$newColName\".";
+        } else {
+            $this->notification->message = "$usersDisplayName moved \"$task->name\" from \"$oldColName\" to \"$newColName\".";
+        }
         $this->notification->project = $this->project;
         $this->notification->data = $request->all();
         $this->notification->updatedBy = "u".$this->updatedBy;

@@ -5,17 +5,17 @@
 	margin-top:50px;
 }
 .disablePage {
-    height: 100vh;
     margin: 0;
     width: 100%;
-    z-index: 1600;
+    z-index: 1020;
     opacity: 0.4;
     background-color: black;
     cursor: not-allowed;
     position: fixed;
     display: inline-block;
     left: 0;
-    top: $navbar-height;
+    top:0;
+    height: 100vh;
 }
 #taskManagementApp {
     margin-top: 10px;
@@ -30,7 +30,7 @@
 	padding: 0px !important;
 }
 .task-column {
-	min-height: 1px;
+	min-height: 20px;
 	padding-top: 0px;
 	border-right: 1px solid #CCC;
 }
@@ -105,6 +105,14 @@
     max-width: 600px;
     margin: 0 auto 20px auto;
 }
+.create-new-task-button {
+	@extend .btn;
+	@extend .btn-raised;
+	@extend .btn-primary;
+	max-width: 600px;
+    margin: 0 auto 20px auto;
+	width:100%;
+}
 a:hover {
 	cursor: pointer;
 }
@@ -126,3 +134,14 @@ a:hover {
   transform: scale(0.8);
   display: inline-block;
 }
+
+.task-card_dropdown-menu {
+	@extend .dropdown-menu;
+}
+@media only screen and (max-width: $screen-md) {
+	.task-card_dropdown-menu {
+		right: 0;
+  		left: auto;
+	}
+}
+

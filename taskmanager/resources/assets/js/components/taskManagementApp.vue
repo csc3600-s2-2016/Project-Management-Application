@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div :class="disconnectedFromServer ? 'disablePage' : '' "></div>
+    <div v-if="disconnectedFromServer" class="disablePage"></div>
 	<new-task-modal :users="users"></new-task-modal>
     <edit-task-modal id="editTaskModal" :task="taskToEdit" :users="users"></edit-task-modal>
     <div :style="container">
@@ -19,18 +19,9 @@ import EditTaskModal from './editTaskModal.vue';
 export default {
     data () {
         return {
-            serverAddress: '192.168.33.10',
-            categories: [
-                "To Do", "In Progress", "Completed", "Too Hard Basket"
-            ],
-        	tasks: {
-        		
-        	},
-            users: {
-                u1: {id: "u1", displayName:"John"},
-                u2: {id: "u2", displayName:"Sarah"},
-                
-            },
+            categories: [],
+        	tasks: {},
+            users: {},
             currentUser: "",
             taskToEdit: "",
             disconnectedFromServer : false
@@ -66,7 +57,7 @@ export default {
 
                 //convert duedate to Date object
                 if (tasks[id].dueDate){
-                    tasks[id].dueDate = new Date(tasks[id].dueDate);
+                    tasks[id].dueDate = new Date(tasks[id].dueDate + "T00:00:00");
                 }
 
                 // convert logged times to Date object
@@ -74,7 +65,7 @@ export default {
                     for (var i=0; i<tasks[id].loggedTimeHistory.length; i++){
                         var log = tasks[id].loggedTimeHistory[i];
                         log.task = 't' + log.task;
-                        log.startDateTime = new Date(log.start_date_time);
+                        log.startDateTime = new Date(log.start_date_time.replace(" ","t"));
                         delete log.start_date_time;
                         log.timeLogged = log.time_logged;
                         delete log.time_logged;
@@ -214,13 +205,14 @@ export default {
     },
     ready: function() {
         this.currentUser = this.getCookie('uid');
-        var socket = io('http://192.168.33.10:3000');
+        var socket = io('http://taskmanager.site:3000');
 
 
         //load project from server
         this.$http.get('/taskdata').then((response) => {
             var tasks = this.processIncomingTasksData(response.json().tasks);
             this.tasks = Object.assign({}, this.tasks, tasks);
+            this.categories = (response.json().categories);
             this.users = (response.json().users);
             this.currentUser = (response.json().currentUser);
             toastr.success("Project loaded.");
@@ -246,6 +238,8 @@ export default {
             toastr.remove();
             toastr.options.timeOut = 0;
             toastr.warning("Trying to reconnect...", "Disconnected from server!");
+            jQuery('.modal').modal('hide');
+
         });
         socket.on('userOnline', function (user) {
             if (user.id !== vm.currentUser) {
