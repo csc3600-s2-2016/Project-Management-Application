@@ -19,7 +19,7 @@
                 <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="dLabel">
+                <ul :class="dropdownMenuClass" aria-labelledby="dLabel">
                     <li>
                         <a data-toggle="modal" data-target="{{'#' + randomIdentifier}}">
                             <i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview
@@ -139,6 +139,13 @@ export default {
 
                 }
             };
+        },
+        dropdownMenuClass: function(){
+            if (this.task.status == this.cols.length - 1){
+                return "task-card_dropdown-menu dropdown-menu-right";
+            } else {
+                return "task-card_dropdown-menu";
+            }
         }
     },
     methods: {
@@ -166,13 +173,15 @@ export default {
         },
         'recalculateTimeLogged' : function(msg){
             if (!this.task.loggedTimeHistory){
-                return parseFloat(0);
+                return null;
             }
             var time = parseFloat(0);
             for(var i = 0; i<this.task.loggedTimeHistory.length;i++){
                 time += parseFloat(this.task.loggedTimeHistory[i].timeLogged);
             }
-            
+
+            if (!time){ return null; }
+
             if (time % 1 === 0){
                 this.task.timeLogged = time.toFixed();
             } else if (time % 0.5 === 0){

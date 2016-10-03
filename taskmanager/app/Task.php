@@ -19,7 +19,7 @@ class Task extends Model
     	return $this->hasMany(LoggedTime::class, 'task');
     }
     public function project(){
-        return $this->hasOne(Project::class, 'project');
+        return $this->belongsTo(Project::class, 'project');
     }
 
     public function setDueDateAttribute($value){

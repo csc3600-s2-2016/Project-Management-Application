@@ -6,9 +6,9 @@
 			</span>
 		</div>
         <div class="task-column" :style="colPadding" @dragover.prevent="dragOver" @drop.prevent="colDropZone">
-                <div v-if="colID === 0" class="btn btn-raised btn-primary" style="width:100%;margin-top:0px;" data-toggle="modal" data-target="#newTaskModal">create new task</div>
+                <div class="text-center" style="width:100%"> <div v-if="colID === 0" class=" create-new-task-button" data-toggle="modal" data-target="#newTaskModal">create new task</div></div>
 
-                <task-card v-for="(key, task) in tasks | filterBy colID in 'status' | orderBy 'priority' " :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" 
+                <task-card v-for="(key, task) in colTasks | orderBy 'priority' " :task.sync="task" :users="users" :current-user="currentUser" :id="key" :cols="colNames" 
                  :draggable="!key.includes('TEMPORARY')" @dragstart="dragStart" :class=" key.includes('TEMPORARY') ? 'taskCard' : 'draggableCursor taskCard' " ></task-card>
 
         </div>
