@@ -11,13 +11,20 @@ require('bootstrap');
 //Add components
 import TaskCard from './components/taskCard.vue';
 import NavbarHorizontal from './components/navbarHorizontal.vue';
-
+import UserProfile from './components/userProfile.vue';
+import ProjectStatusPanel from './components/projectStatusPanel.vue';
+import UserDetails from './components/userDetails.vue';
+import UserContributions from './components/userContributions.vue';
 Vue.use(Sortable);
 
 new Vue({
   el: 'body',
   components: { 
   	taskCard: TaskCard,
-  	navbarHorizontal: NavbarHorizontal
+  	navbarHorizontal: NavbarHorizontal,
+    userProfile : UserProfile,
+    projectStatusPanel: ProjectStatusPanel,
+    userDetails: UserDetails,
+    userContributions: UserContributions
   }
 });

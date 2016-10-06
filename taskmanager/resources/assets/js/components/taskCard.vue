@@ -23,7 +23,10 @@
 .task-summary:hover {
     background-color:  #cce6ff !important;
 }
-
+progress !important {
+    background-color: white !important;
+    color:white !important;
+}
 </style>
 
 <template id="taskCard-template">
@@ -48,7 +51,7 @@
                 </ul>
             </div>
         </div>
-        <div class="h6"> Due 3/10/16, [30/80hrs] </div> 
+        <div class="h6"> Due 3/10/16, [{{expendedEffort}}/{{expectedEffort}}hrs] </div> 
         <h4>
             <span class="label label-default">Bill</span>
             <span class="label label-default">Matt</span>
@@ -58,9 +61,12 @@
                     4
                 </span>
             </a>
-
         </h4>
-
+        <div class="progress">
+            <div class="progress-bar" style="width:{{progress()}}%;">
+                <span class="sr-only">{{progress()}}% Complete</span>
+            </div>
+        </div>
 
     </div>
 
@@ -68,8 +74,8 @@
         
         
         <ul class="subtaskList" v-sortable="{animation: 250}">
-            <li>A subtask for the task</li>
-            <li>Another subtask right here</li>
+            <li>A subtask for the task </li>
+            <li>Another subtask right here </li>
             <li>This is yet another subtask</li>
             <li>A task that is part of another task</li>
         </ul>
@@ -84,11 +90,19 @@ export default {
         return {
             title: "Task Title",
             showSubtasks: false,
+            expendedEffort: 20,
+            expectedEffort: 100
         }
     },
     methods: {
-        toggleSubtasks: function(){
+        toggleSubtasks(){
             this.showSubtasks = ! this.showSubtasks;
+        },
+        requestSubTasks(){
+            // request list of subtasks 
+        },
+        progress(){
+            return parseInt(this.expendedEffort/this.expectedEffort*100)
         }
     }
 }
