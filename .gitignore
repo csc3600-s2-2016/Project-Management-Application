@@ -1,6 +1,8 @@
 .DS_STORE
 .vagrant
 .box
+.idea
+.phpintel
 /taskmanager/node_modules/*
 /taskmanager/public
 /nbproject/private/

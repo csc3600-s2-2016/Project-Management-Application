@@ -15,6 +15,8 @@ import UserProfile from './components/userProfile.vue';
 import ProjectStatusPanel from './components/projectStatusPanel.vue';
 import UserDetails from './components/userDetails.vue';
 import UserContributions from './components/userContributions.vue';
+import ProjectManager from './components/projectManager.vue';
+
 Vue.use(Sortable);
 
 new Vue({
@@ -25,6 +27,7 @@ new Vue({
     userProfile : UserProfile,
     projectStatusPanel: ProjectStatusPanel,
     userDetails: UserDetails,
-    userContributions: UserContributions
+    userContributions: UserContributions,
+    projectManager: ProjectManager
   }
 });

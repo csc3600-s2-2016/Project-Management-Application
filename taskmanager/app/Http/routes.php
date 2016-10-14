@@ -26,3 +26,7 @@ Route::get('/project', function () {
 Route::get('/profile', function () {
    return view('profile');
 });
+
+Route::get('/project', function() {
+   return view('project');
+});
