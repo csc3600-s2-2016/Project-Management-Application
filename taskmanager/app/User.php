@@ -12,7 +12,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'display_name'
     ];
 
     /**
@@ -23,4 +23,17 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+
+    // public function Tasks()
+    // {
+    //     return $this->hasMany('App\Task');
+    // }
+
+    public function loggedTimes(){
+        return $this->hasMany(LoggedTime::class);
+    }
+    public function tasks(){
+        return $this->belongsToMany(Task::class, 'usersTasks', "user_id", "task_id");
+    }
 }

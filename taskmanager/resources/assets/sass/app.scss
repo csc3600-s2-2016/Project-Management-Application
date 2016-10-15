@@ -1,10 +1,57 @@
-@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap.scss";
-@import "node_modules/bootstrap-material-design/sass/bootstrap-material-design.scss";
-@import "fontawesome/font-awesome.scss";
-@import "components/tasksPage.scss";
-@import "components/welcomePage.scss";
+@import "variables";
+@import "node_modules/bootstrap-material-design/sass/bootstrap-material-design";
+@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "node_modules/bootstrap-material-design/sass/bootstrap-material-design";
+@import 'node_modules/flatpickr/dist/flatpickr.min';
+@import "fontawesome/font-awesome";
+@import "components/tasksPage";
+@import "components/welcomePage";
+@import "toastr";
+ 
+// - - - - - - - - - - - - - - - - - - - - - - - - 
+
 
 body {
-	background: #EEEEEE;
+  background-color: $body-bg;
+  &.inverse {
+    background: #333333;
+    &, .form-control {
+      color: $mdb-text-color-light;
+    }
+    .modal,
+    .panel-default,
+    .card {
+      &,
+      .form-control {
+        background-color: initial;
+        color: initial;
+      }
+    }
+
+  }
 }
 
+.form-group label.control-label {
+  font-size: 14px;
+  color: #222;
+  margin: 12px 0 0 0;
+}
+
+
+
+body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4 {
+  font-family: $font-family-sans-serif;
+  font-weight: 300;
+}
+
+h5, h6{
+  font-weight: 400;
+}
+
+a, a:hover, a:focus {
+  color: $link-color;
+
+  & .material-icons {
+    vertical-align: middle;
+  }
+}

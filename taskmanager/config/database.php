@@ -7,9 +7,9 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'homestead'),
-            'username'  => env('DB_USERNAME', 'homestead'),
-            'password'  => env('DB_PASSWORD', 'secret'),
+            'database'  => env('DB_DATABASE', 'scotchbox'),
+            'username'  => env('DB_USERNAME', 'root'),
+            'password'  => env('DB_PASSWORD', 'root'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
@@ -18,9 +18,9 @@ return [
         'testing' => [
             'driver'    => 'mysql',
             'host'      => env('DB_TEST_HOST', 'localhost'),
-            'database'  => env('DB_TEST_DATABASE', 'homestead_test'),
-            'username'  => env('DB_TEST_USERNAME', 'homestead'),
-            'password'  => env('DB_TEST_PASSWORD', 'secret'),
+            'database'  => env('DB_TEST_DATABASE', 'scotchbox_test'),
+            'username'  => env('DB_TEST_USERNAME', 'root'),
+            'password'  => env('DB_TEST_PASSWORD', 'root'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
@@ -28,4 +28,18 @@ return [
         ],
     ],
     //...
+    'migrations' => 'migrations',
+
+    'redis' => [
+
+        'cluster' => false,
+
+        'default' => [
+            'host' => env('REDIS_HOST', 'localhost'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => 0,
+        ],
+
+    ],
 ];

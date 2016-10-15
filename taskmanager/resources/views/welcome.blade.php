@@ -2,7 +2,7 @@
 
 @section('content')
 
-<body>
+<div class="welcomPage">
     <!-- Header -->
     <a name="about"></a>
     <div class="intro-header">
@@ -16,7 +16,7 @@
                         <hr class="intro-divider">
                         <ul class="list-inline intro-social-buttons">
                             <li>
-                                <a href="#" class="btn btn-primary btn-lg btn-raised"><span class="network-name">Set up a project</span></a>
+                                <a href="/projects" class="btn btn-primary btn-lg btn-raised"><span class="network-name">Set up a project</span></a>
                             </li>
                            <!--  <li>
                                 <a href="https://github.com/IronSummitMedia/startbootstrap" class="btn btn-default btn-lg"><span class="network-name">Login</span></a>
@@ -34,7 +34,7 @@
 
     <!-- Page Content -->
 
-	<a  name="services"></a>
+    <a  name="services"></a>
     <div class="content-section-a">
 
         <div class="container">
@@ -46,7 +46,7 @@
                     <p class="lead">Keep track of what is happening on your project with the task and time management features</p>
                 </div>
                 <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    <img class="img-responsive" src="https://hd.unsplash.com/photo-1415604934674-561df9abf539" alt="">
+                    <img class="img-responsive" src="/img/clock.jpeg" alt="">
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
                     <p class="lead">Get just a general overview or drill down to see how each individual task is progressing.</p>
                 </div>
                 <div class="col-lg-5 col-sm-pull-6  col-sm-6">
-                    <img class="img-responsive" src="https://hd.unsplash.com/photo-1468779036391-52341f60b55d" alt="">
+                    <img class="img-responsive" src="/img/books.jpeg" alt="">
                 </div>
             </div>
 
@@ -90,7 +90,7 @@
                     <p class="lead">Great minds think alike; make something great together. Task Manager is team enabled.</p>
                 </div>
                 <div class="col-lg-5 col-lg-offset-2 col-sm-6">
-                    <img class="img-responsive" src="https://hd.unsplash.com/photo-1458639817867-2c9d4c5dcad4" alt="">
+                    <img class="img-responsive" src="/img/theater.jpeg" alt="">
                 </div>
             </div>
 
@@ -100,7 +100,7 @@
     </div>
     <!-- /.content-section-a -->
 
-	<a  name="contact"></a>
+    <a  name="contact"></a>
     <!-- <div class="banner">
 
         <div class="container">
@@ -152,10 +152,10 @@
                             <a href="#contact">Contact</a>
                         </li>
                     </ul>
-                    <p class="copyright text-muted small">Copyright &copy; Your Company 2014. All Rights Reserved</p>
+                    <p class="copyright text-muted small">Copyright &copy; USQ 2016. All Rights Reserved</p>
                 </div>
             </div>
         </div>
     </footer>
-        
+</div>
 @stop

@@ -10,10 +10,20 @@
 | and give it the controller to call when that URI is requested.
 |
 */
+use Illuminate\Support\Facades\Redis;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::auth();
+
+Route::get('/', 'HomeController@index');
+
+Route::get('/projects', 'taskController@index');
+
+Route::get('/tasks', 'taskController@index' );
+
+Route::get('/taskdata', 'taskController@getAll');
+
+Route::post('/taskdata', 'taskController@updateProject');
+
 
 Route::get('/tasks', function () {
     return view('tasks');
