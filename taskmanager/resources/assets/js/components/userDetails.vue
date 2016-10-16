@@ -47,12 +47,12 @@
 <script>
     export default{
         props: {
-            userId: {type: Number, default: 0}
+            userId: {type: Number, default: 0},
+            username: {type: String, default: ""},
+            email: {type: String, default: ""}
         },
         data(){
               return{
-                  email: "",
-                  username: "",
                   passwordOne: "",
                   passwordTwo: ""
               };
@@ -70,8 +70,8 @@
           },
           submitNewPassword(){
               this.$http.post(
-                      "/user/{uid}/updatePassword",
-                      {data : {}
+                      "/profile/update",
+                      {data : {"updatePassword": true}
               }).then((response) => {
                   //on success
               }, (response) => {
