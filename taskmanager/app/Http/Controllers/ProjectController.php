@@ -34,12 +34,15 @@ class ProjectController extends Controller
         {
             return response()->setStatusCode(403);
         }
-
+        $b = 2; //making stuff work
         $project = $this->getProject($id);
         $proInfo = new ProjectDataJSON();
         $proInfo->numMembers = \App\UsersProjects::where('project_id', $project->id)->count();
         $proInfo->projectName = $project->name;
         $proInfo->projectId = $project->id;
+        $proInfo->archived = ! $project->active;
+        $proInfo->numTasks = \App\Task::where('project', $project->id)->count();
+        $proInfo->openTasks = \App\Task::where([['project', $project->id],['archived', 1]])->count();
 
         $proInfo->projectMembers = \App\UsersProjects::where('project_id',$project->id)->get()->reduce(function($carry, $item){
             $user = \App\User::where('id', $item->getAttribute('id'))->first();
@@ -52,6 +55,9 @@ class ProjectController extends Controller
             return array_push($carry, $projectMem);
 
         }, []);
+        $proInfo->projectMembers = [ ["tasksCreated" => \App\Task::where('created_by', Auth::user()->id)->count(),
+            "userid" => Auth::user()->id,
+            "username" => Auth::user()->display_name]]; // demo data
 
         return new JsonResponse(json_encode($proInfo));
     }
@@ -99,4 +105,6 @@ class ProjectMemberJSON {
     public $username;
     public $userid;
     public $taskscreated;
+    public $numTasks;
+    public $openTasks;
 }
