@@ -201,6 +201,10 @@ export default {
             this.sendToServer({"updateType": "archiveTask", "taskId": taskId});
             delete this.tasks[taskId];
             this.tasks = Object.assign({}, this.tasks);
+        },
+        'completeTask' : function(taskId){
+            this.tasks[taskId].completed = new Date();
+            this.sendToServer({"updateType": "completeTask", "taskId": taskId, "completed": this.tasks[taskId].completed});
         }
     },
     ready: function() {
@@ -320,6 +324,12 @@ export default {
                 toastr.info(sentStuff.message);
                 delete vm.tasks[sentStuff.data.taskId];
                 vm.tasks = Object.assign({}, vm.tasks);
+            }
+        });
+        socket.on("completeTask", function(sentStuff){
+            if (sentStuff.updatedBy !== vm.currentUser){
+                toastr.info(sentStuff.message);
+                vm.tasks[sentStuff.data.taskId].complete = sentStuff.data.completed;
             }
         });
         socket.on("editTask", function (sentStuff) {

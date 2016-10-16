@@ -81,6 +81,7 @@ class taskController extends Controller
     		$taskJSON->dueDate = $task->due_date;
     		$taskJSON->priority = $task->priority;
     		$taskJSON->status = $task->status;
+            $taskJSON->completed = $task->completed;
     		$taskJSON->timeEstimated = $task->time_estimated;
     		foreach ($task->subtasks->sortBy('priority') as $subtask) {
     			array_push($taskJSON->subtasks, $subtask);
@@ -163,6 +164,7 @@ class TaskJSON {
 	public $status ="";
 	public $subtasks = array();
 	public $timeEstimated = "";
+    public $completed = "";
 }
 
 class UserJSON{
@@ -462,6 +464,23 @@ class UpdatedData {
         $this->notification->updateType = $this->updateType;
         $this->notification->shouldBroadcast = true;
     }
+    public function completeTask($req){
+        $taskId = $req->input("taskId");
+        if (strpos($taskId, "t") == 0){
+            $taskId = substr_replace($taskId, '', 0, 1);
+        }
+        $task = Task::find($taskId);
+        $task->completed = $req->input("completed");
+        $task->save();
+
+        $usersDisplayName = User::find($this->updatedBy)->display_name;
+        $this->notification->message = "$usersDisplayName marked task, \"$task->name\", as complete! Great Job!";
+        $this->notification->project = $this->project;
+        $this->notification->data = $req->all();
+        $this->notification->updatedBy = "u".$this->updatedBy;
+        $this->notification->updateType = $this->updateType;
+        $this->notification->shouldBroadcast = true;
+    }
 
     private function performUpdate($req){
         switch ($this->updateType) {
@@ -488,6 +507,9 @@ class UpdatedData {
                 break;
             case "archiveTask":                  //need to implement an archive task button and then only load un-archived tasks
                 $this->archiveTask($req);
+                break;
+            case "completeTask":
+                $this->completeTask($req);
                 break;
             default:
                 $this->response = Response("Undefined update type. How the hell are me meant to process that?!", 400);

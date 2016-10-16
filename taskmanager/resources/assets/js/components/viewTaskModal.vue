@@ -25,7 +25,9 @@
         </button>
         <div class="row">
           <div class="col-sm-8">
-            <span class="h3 modal-title">{{task.name}}</span>
+            
+            <span class="h3 modal-title">
+            <span v-show="task.completed !== null" class="fa fa-trophy fa-fw"></span>  {{task.name}}</span>
           </div>
           
         </div>
@@ -103,11 +105,14 @@
             <h3 ><span v-for="userID in task.assignedUsers" class="label label-username">{{users[userID].displayName}}</span></h3>
           </div>
 
-          <div class="text-center" style="margin-top:30px;">
+          <div v-show="task.completed === null" class="text-center" style="margin-top:30px;">
             <a v-on:click="showLogTimeModal">
-              <button class="btn btn-primary btn-raised"><span class="fa fa-clock-o"></span> Log Time</button>
+              <button class="btn btn-primary btn-raised"><span class="fa fa-fw fa-clock-o"></span> Log Time</button>
             </a>
             
+          </div>
+          <div v-show="task.completed === null && task.status === cols.length - 1" class="text-center">
+              <button class="btn btn-primary btn-raised" @click="completeTask"><span class="fa fa-trophy fa-fw"></span> complete</button>
           </div>
 
 
@@ -247,6 +252,9 @@ export default {
       updateSubtaskStatus: function(event, i) {
         var data = {"subtaskId": this.task.subtasks[i].id, "complete": !this.task.subtasks[i].complete , "taskId": this.task.subtasks[i].task};
         this.$dispatch('completeSubtask', data);
+      },
+      completeTask: function(){
+        this.$dispatch("completeTask", this.taskId);
       }
     },
     ready: function(){
