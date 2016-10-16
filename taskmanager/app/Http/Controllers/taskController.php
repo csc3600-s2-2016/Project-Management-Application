@@ -29,17 +29,37 @@ class taskController extends Controller
     	return view('tasks');
     }
 
+    public function setProject($id){
+        $project = Project::find($id);
+        if ($project == null){
+            return response(404);
+        }
+        if (!Auth::check()){
+            return view("login");
+        }
+        if (! Auth::user()->projects->contains($id)){
+            return response(403);
+        }
+        session(["project" => $id]);
+        return redirect()->action('taskController@index');
+    }
     /**
     *       Fresh load of tasks page.
     *       - generates key to authenticate user for websocket subscription
     */
-    public function index(){
-        //put some dummy data in session for testing
-        session(["project" => "1"]);
+    public function index(Request $request){
+        if (Auth::user()->projects->isEmpty()){
+            return redirect()->action('ProjectController@index');
+        }
+        if (! $request->session()->has("project")){
+            session(["project" => Auth::user()->projects()->first()->id ]);
+        }
         //for testing
         if (Auth::check()) {
             $redisdata = (["project" => session("project")]);
             $redisdata["user"] = (["id"=>"u" . Auth::user()->id, "name"=>Auth::user()->display_name ]);   //for testing!!
+        } else {
+            return view("login");
         }
         //generate key for websocket authentication.
         $socketKey = $this->keygen();

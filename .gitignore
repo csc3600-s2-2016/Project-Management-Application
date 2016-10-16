@@ -9,5 +9,4 @@
 /nbproject
 csc3600.box
 /taskmanager/npm-debug.log*
-
-
+.phpIntel

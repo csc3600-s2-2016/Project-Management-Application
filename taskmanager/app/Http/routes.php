@@ -16,13 +16,20 @@ Route::auth();
 
 Route::get('/', 'HomeController@index');
 
-Route::get('/projects', 'taskController@index');
-
 Route::get('/tasks', 'taskController@index' );
-
+Route::get('/tasks/{id}', 'taskController@setProject' );
 Route::get('/taskdata', 'taskController@getAll');
-
 Route::post('/taskdata', 'taskController@updateProject');
 
 Route::get('/review', 'reviewController@index');
 
+Route::get('/projects/{id}', 'ProjectController@project');
+Route::get('/create-new-project', 'ProjectController@newProject');
+Route::post('/create-new-project', 'ProjectController@create');
+Route::post('/project/invite', 'ProjectController@invite');
+Route::get('/projects', 'ProjectController@index');
+Route::get('/profile', 'UserController@index');
+Route::post('/profile', 'UserController@postData');
+Route::get('/profile/getAll', 'UserController@getAll');
+Route::get('/projects/{id}/archive', 'ProjectController@archive');
+Route::get('/projects/{id}/getAll', 'ProjectController@getAll');

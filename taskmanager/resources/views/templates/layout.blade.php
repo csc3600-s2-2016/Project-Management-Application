@@ -53,6 +53,7 @@
               @endif
               ><a href="/review">Review</a></li>
               @endif
+              
             </ul>
       
             <ul class="nav navbar-nav navbar-right">
@@ -75,6 +76,14 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
+                                <li class="dropdown-header">Projects</li>
+                                @foreach ( Auth::user()->projects as $project  )
+                                    @if ($project->active == true)
+                                    <li><a href="/tasks/{{$project->id}}"><i class="fa fa-btn fa-star"></i> {{$project->name}}</a></li>
+                                    @endif
+                                @endforeach
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ url('/profile') }}"><i class="fa fa-btn fa-user"></i> My Profile</a></li>
                                 <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
                             </ul>
                         </li>

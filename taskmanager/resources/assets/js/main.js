@@ -15,6 +15,9 @@ var ReviewApp = require('./components/reviewApp.vue');
 global.Chart = require('chart.js');
 
 import TaskManagementApp from './components/taskManagementApp.vue';
+import UserProfileApp from './components/userProfileApp.vue';
+import ProjectManagerApp from './components/projectManagerApp.vue';
+var ProjectsPage = require('./components/projectsPage.vue');
 
 
 Vue.use(Sortable);
@@ -35,12 +38,15 @@ var taskApp = new Vue({
   ready: function(){
   	jQuery.material.init();
   	jQuery(function () {
-  		jQuery('[data-toggle="tooltip"]').tooltip()
+  		jQuery('[data-toggle="tooltip"]').tooltip();
 	});
   },
   components: { 
   	taskManagementApp: TaskManagementApp,
-    reviewApp: ReviewApp
+    reviewApp: ReviewApp,
+    userProfileApp: UserProfileApp,
+    projectManagerApp: ProjectManagerApp,
+    projectsPage: ProjectsPage
   }
 });
 

@@ -3,10 +3,14 @@
     <div v-if="disconnectedFromServer" class="disablePage"></div>
 	<new-task-modal :users="users"></new-task-modal>
     <edit-task-modal id="editTaskModal" :task="taskToEdit" :users="users"></edit-task-modal>
-    <div :style="container">
+    <div v-if="loaded" :style="container">
         <div id="taskManagementApp" class="row">
             <task-column v-for="category in categories" :name.sync="category" :col-names.sync="categories" :tasks.sync="tasks" :users="users" :current-user="currentUser"></task-column>
         </div>
+    </div>
+    <div v-if="!loaded" style="margin-top:40vh;" class="text-center">
+        <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+        <span class="sr-only">Fetching Data...</span>
     </div>
 </div>
 </template>
@@ -24,7 +28,8 @@ export default {
             users: {},
             currentUser: "",
             taskToEdit: "",
-            disconnectedFromServer : false
+            disconnectedFromServer : false,
+            loaded: false
 
         }
     },
@@ -223,6 +228,7 @@ export default {
             this.users = (response.json().users);
             this.currentUser = (response.json().currentUser);
             toastr.success("Project loaded.");
+            this.loaded = true;
         }, (response) =>{
             toastr.error("Error loading tasks from server!");
         });
