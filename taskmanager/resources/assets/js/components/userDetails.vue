@@ -15,7 +15,7 @@
         </div>
         <div class="col-md-2">
             <div class="form-group">
-                <button type="button" class="btn btn-primary" v-on:click="submitNewUsername">update</button>
+                <button type="button" class="btn btn-primary" v-on:click="submitNewUsernameEmail()">Update</button>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
         </div>
         <div class="col-md-2">
             <div class="form-group">
-                <button type="button" class="btn btn-primary" v-on:click="submitNewPassword">Update</button>
+                <button type="button" class="btn btn-primary" v-on:click="submitNewPassword()">Update</button>
             </div>
         </div>
     </div>
@@ -58,34 +58,26 @@
               };
         },
         methods: {
-          getUsername(){
-            this.$http.get('/user/get', {data : {"userId" : 1}})
-                .then((response) => {
-                    var data = response.data;
-                    this.username = data.username;
-                    this.email = data.email;
-                }, (response) => {
-                    console.log(response);
-                });
-          },
+
+
           submitNewPassword(){
-              this.$http.post(
-                      "/profile/update",
-                      {data : {"updatePassword": true}
-              }).then((response) => {
-                  //on success
+              var dataPackage = {"updatePassword" : true, "passwordOne": this.passwordOne, "passwordTwo": this.passwordTwo};
+              this.$http.post("/profile", dataPackage, {'headers': {'Content-Type': 'application/json'}}).then((response) => {
+                  this.passwordOne = "";
+                  this.passwordTwo = "";
+                  console.log(response);
               }, (response) => {
                   // on failure
               });
           },
-          submitNewUsername(){
-              //update the users username
+          submitNewUsernameEmail(){
+              var dataPackage = {"updateIdentity": true, "username": this.username, "email": this.email};
+              this.$http.post("/profile", dataPackage, {'headers': {'Content-Type': 'application/json'}}).then((response) => {
+                  console.log(response);
+              }, (response) => {
+                  // on failure
+              });
           }
-        },
-        created() {
-            console.log("On create called...");
-            this.getUsername();
-            //when component created ask the server for the magical data
         }
         // on load retrieve user data
     }

@@ -87,6 +87,48 @@ class UserController extends Controller
         return $projectOverview;
     }
 
+    /***
+     * SETTERS
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function postData(Request $request){
+
+        if(is_null($request))
+        {
+            return response(422);
+        }
+        $userModel = Auth::user();
+
+        if($request->input('updatePassword'))
+        {
+            if($request->input('passwordOne') === $request->input('passwordTwo')) {
+                $userModel->password = bcrypt($request->input('passwordOne'));
+                $userModel->save();
+                return response('ok')->setStatusCode(200);
+            }
+        }
+        if($request->input('updateIdentity'))
+        {
+            $newUsername = $request->input('username');
+            $newEmail = $request->input('email');
+
+            if($newEmail !== htmlspecialchars($newEmail)
+                || $newUsername !== htmlspecialchars($newUsername))
+            {
+                return response(422);
+            }
+
+            $userModel->email=$newEmail;
+            $userModel->display_name = $newUsername;
+            $userModel->save();
+
+            return response()->setStatusCode(200);
+        }
+
+        return response(500);
+    }
+
 
 }
 class UserProfileJSON {

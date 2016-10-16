@@ -68,21 +68,6 @@
         data(){
             return{
             }
-        },
-        methods: {
-            getContributionData(){
-                this.$http.get('/user/contribution', {data: {'userId': this.userId}}).then((response) => {
-                    var data = response.data;
-                    this.ttlContributed = data.ttlContributed;
-                    this.numContributed = data.numContributed;
-                }, (response) => {
-                    //failed
-                    console.log(response);
-                })
-            }
-        },
-        created() {
-          this.getContributionData();
         }
     }
 </script>

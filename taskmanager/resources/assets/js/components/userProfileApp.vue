@@ -19,12 +19,14 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="panel panel-success">
-                    <div class="panel-heading panel-success">
+                <div class="panel panel-primary">
+                    <div class="panel-heading panel-primary">
                         <h1>Your Contributions</h1>
                     </div>
                     <user-contributions :ttl-contributed="parseFloat(allData.userProjectInfo.numHours)"
-                                        :num-contributed="allData.userProjectInfo.numTasks"></user-contributions>
+                                        :num-contributed="allData.userProjectInfo.numTasks">
+
+                    </user-contributions>
                 </div>
             </div>
             <div class="col-md-6">
@@ -45,8 +47,8 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid" v-else>
-        <div class="jumbotron"><h1 class="jumbotron-header">Fetching data</h1></div>
+    <div class="container" v-else>
+        <h1 class="" style="text-align:center;">Fetching data</h1>
     </div>
 </template>
 <style>
@@ -83,8 +85,6 @@
         },
         created() {
             this.fetchAllData();
-
-
         }
     }
 </script>
