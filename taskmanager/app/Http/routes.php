@@ -17,14 +17,14 @@ Route::auth();
 Route::get('/', 'HomeController@index');
 
 Route::get('/tasks', 'taskController@index' );
-
+Route::get('/tasks/{id}', 'taskController@setProject' );
 Route::get('/taskdata', 'taskController@getAll');
-
 Route::post('/taskdata', 'taskController@updateProject');
 
 Route::get('/projects/{id}', 'ProjectController@project');
 Route::get('/create-new-project', 'ProjectController@newProject');
 Route::post('/create-new-project', 'ProjectController@create');
+Route::post('/project/invite', 'ProjectController@invite');
 Route::get('/projects', 'ProjectController@index');
 Route::get('/profile', 'UserController@index');
 Route::post('/profile', 'UserController@postData');

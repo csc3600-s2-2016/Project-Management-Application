@@ -1,11 +1,11 @@
 <template>
-    <div class="list-group-item">
+    <div class="list-group-item" style="margin-bottom:30px;">
         <div class="row-action-primary">
             <i class="material-icons">account_box</i>
         </div>
-        <div class="row-content">
+        <div class="row-content" >
             <div class="least-content">UID: {{userId}}</div>
-            <h4 class="list-group-item-heading">{{username}}</h4>
+            <span class="list-group-item-heading">{{username}}</span>
 
             <div class="list-group-item-text">This user has created {{createdTasks}} tasks.</div>
 

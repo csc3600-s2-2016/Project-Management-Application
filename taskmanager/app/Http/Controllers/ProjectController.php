@@ -32,7 +32,8 @@ class ProjectController extends Controller
     public function project($id)
     {
 
-        return view('projects.project');
+        $project = $this->getProject($id);	
+        return view('projects.project',['id' => $id]);
     }
 
     public function newProject(){
@@ -56,11 +57,18 @@ class ProjectController extends Controller
         $project->created_by = $user->id;
         $project->save();
 
+        $user->projects()->attach($project);
+
         return view("projects");
 
 
-        // $project = $this->getProject($id);				//from merge! not sure where they were from
-        // return view('project',['id' => $id]);
+    }
+
+    public function invite($request){
+    	//todo: add userProject entry
+    }
+    public function acceptInvite($request){
+    	//todo: mark userProject entry as inite accepted
     }
 
     public function getAll($id)
@@ -79,20 +87,30 @@ class ProjectController extends Controller
         $proInfo->numTasks = \App\Task::where('project', $project->id)->count();
         $proInfo->openTasks = \App\Task::where([['project', $project->id],['archived', 1]])->count();
 
-        $proInfo->projectMembers = \App\UsersProjects::where('project_id',$project->id)->get()->reduce(function($carry, $item){
-            $user = \App\User::where('id', $item->getAttribute('id'))->first();
+        // $proInfo->projectMembers = \App\UsersProjects::where('project_id',$project->id)->get()->reduce(function($carry, $item){
+        //     $user = \App\User::where('id', $item->getAttribute('id'))->first();
 
-            $projectMem = new ProjectMemberJSON();
-            $projectMem->taskscreated = \App\Task::where('created_by', $user['id'])->count();
-            $projectMem->userid = $user['id'];
-            $projectMem->username = $user['display_name'];
+        //     $projectMem = new ProjectMemberJSON();
+        //     $projectMem->taskscreated = \App\Task::where('created_by', $user['id'])->count();
+        //     $projectMem->userid = $user['id'];
+        //     $projectMem->username = $user['display_name'];
 
-            return array_push($carry, $projectMem);
+        //     return array_push($carry, $projectMem);
 
-        }, []);
-        $proInfo->projectMembers = [ ["tasksCreated" => \App\Task::where('created_by', Auth::user()->id)->count(),
-            "userid" => Auth::user()->id,
-            "username" => Auth::user()->display_name]]; // demo data
+        // }, []);
+
+
+        // $proInfo->projectMembers = [ ["tasksCreated" => \App\Task::where('created_by', Auth::user()->id)->count(),
+        //     "userid" => Auth::user()->id,
+        //     "username" => Auth::user()->display_name]]; // demo data
+
+        foreach ($project->users as $user) {
+        	$projectMem = new ProjectMemberJSON();
+        	$projectMem->taskscreated = \App\Task::where('created_by', $user->id)->count();
+        	$projectMem->userid = $user->id;
+        	$projectMem->username = $user->display_name;
+        	array_push($proInfo->projectMembers, $projectMem);
+        }
 
         return new JsonResponse(json_encode($proInfo));
     }
@@ -104,17 +122,7 @@ class ProjectController extends Controller
 
     private function authedUserIsMember($id)
     {
-        $user = Auth::user();
-        $project = $this->getProject($id);
-
-        if($project->created_by === $user->id) return true;
-
-        $data = \App\UsersProjects::where(function ($query) use ($user, $project){
-           $query->where('user_id',$user->id)->andWhere('project_id', $project->id);
-        })->firstOrFail();
-        if($data) return true;
-
-        return false;
+        return Auth::user()->projects->contains($id);
     }
     public function archive($id)
     {
@@ -123,11 +131,11 @@ class ProjectController extends Controller
 
         if($project->created_by === $userModel->id)
         {
-            $project->archived = 1;
+            $project->active = false;
             $project->save();
-            return response()->setStatusCode(200);
+            return response(200);
         }
-        return response()->setStatusCode(403);
+        return response(403);
     }
 }
 class ProjectDataJSON {

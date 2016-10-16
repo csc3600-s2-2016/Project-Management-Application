@@ -1,41 +1,31 @@
 <template>
-<div class="container-fluid" v-if="loaded">
-    <!-- Titles -->
-    <div class="row">
-
-        <div class="container">
-        <div class="row"><h2>Manage: {{projectData.projectName}}</h2></div>
-        <div class="row" v-show="projectData.archived">This project is archived</div>
-        </div>
+<div class="container">
+    <div v-if="!loaded" style="margin-top:40vh;" class="text-center">
+        <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+        <span class="sr-only">Fetching Data...</span>
     </div>
-    <div class="row">
-
-        <!-- Project People Information -->
-        <div class="col-md-4" id="project-people">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3>Manage People</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="list-group">
-                        <user-project-stats v-for="userStats in projectData.projectMembers"
-                                            :user-id="userStats.userid"
-                                            :username="userStats.username"
-                                            :created-tasks="userStats.tasksCreated"
-                        >
-
-                        </user-project-stats>
+    <!-- Titles -->
+    <div v-if="loaded">
+        <div class="row">
+            <div class="col-md-12" style="margin-top:80px; ">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h1> {{projectData.projectName}} <small style="color:#ccc;"> - Project Management</small></h1>
+                        <p v-show="projectData.archived">This project is archived</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Project Stats Cards -->
-        <div class="col-md-4" id="project-stats">
-            <div class="panel panel-primary">
+        
+    <div class="row">
+        <div class="col-md-5">
+            <div class="row">
+                <!-- Project Stats Cards -->
+        <div class="col-md-12" id="project-stats">
+            <div class="panel panel-info">
 
                 <div class="panel-heading">
-                    <h3>Project Stats</h3>
+                    <h4>Project Stats</h4>
                 </div>
 
                 <div class="panel-body"><div class="list-group">
@@ -106,15 +96,17 @@
                     </div>
                 </div></div>
             </div>
+        </div> <!-- end stats col -->
+         
         </div>
-
+        <div class="row">
         <!-- Project Actions -->
-        <div class="col-md-4" id="project-actions">
+        <div class="col-md-12" id="project-actions">
             <div class="panel panel-danger">
                 <div class="panel-heading">
-                    <h3>Danger Zone</h3>
+                    <h4>Danger Zone</h4>
                 </div>
-                <div class="panel-body">
+                <div class="panel-body"  >
                     <div class="row">
                         <button class="btn btn-danger" v-on:click="changeProjectManager()">Change Project Manager</button>
                         <select v-model="newManager">
@@ -122,17 +114,81 @@
                             <option v-for="userStats in projectData.projectMembers" :value="userStats.userId">{{userStats.username}}</option>
                         </select>
                     </div>
-                    <div class="row">
-                        <button class="btn btn-danger" v-on:click="archiveProject()">Archive Project</button>
+                    <div class="row" >
+                        <button v-if="!projectData.archived" class="btn btn-danger" v-on:click="archiveProject()">Archive Project</button>
                     </div>
                 </div>
             </div>
         </div>
+        
+
+            </div>
+        </div>
+        
+
+
+
+           <!-- Project People Information -->
+           <div class="col-md-7">
+           <div class="row">
+
+
+        <div class="col-md-12" id="project-people">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h4>Invite People To Join Project</h4>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" style="padding:10px 30px;">
+                      <div class="form-group">
+                          <label for="inputEmail" class="col-md-2 control-label">Email</label>
+                          <div class="col-md-10">
+                            <input v-model="inviteEmail" type="email" class="form-control" id="inputEmail" placeholder="Email">
+                          </div>
+                        </div>
+                        <div class="text-center">
+                      <button class="btn btn-default" @click.prevent="sendInvite">Send invitation</button>
+                      </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+
+           <div class="row">
+        <div class="col-md-12" id="project-people">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h4>Current Project Members</h4>
+                </div>
+                <div class="panel-body">
+                    <div class="list-group">
+                        <user-project-stats v-for="userStats in projectData.projectMembers"
+                                            :user-id="userStats.userid"
+                                            :username="userStats.username"
+                                            :created-tasks="userStats.tasksCreated"
+                        >
+
+                        </user-project-stats>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        
+        </div>
+
+
+
+
+
+        
     </div>
 </div>
-<div v-else>
-    <h1>Fetching Data</h1>
-</div>
+
+    </div>
 </template>
 <style>
 </style>
@@ -146,7 +202,8 @@
             return{
                 projectData : {},
                 loaded: false,
-                newManager: ""
+                newManager: "",
+                inviteEmail: ""
             }
         },
         components:{
@@ -170,9 +227,20 @@
 
               });
           },
+          sendInvite() {
+            var formData = new FormData();
+            formData.append('invite', this.inviteEmail);
+            this.$http.post('/projects/invite', formData).then((response)=>{
+                alert("Invite Sent");
+            }, (response) => {
+
+            });
+            this.inviteEmail = "";
+          },
           fetchAllData(){
               this.$http.get('/projects/' + this.projectId + '/getAll').then((response)=>{
                 this.projectData = JSON.parse(response.data);
+                this.loaded = true;
               }, (response) =>{
 
               });
@@ -181,7 +249,6 @@
         created()
         {
             this.fetchAllData();
-            this.loaded = true;
         }
     }
 </script>

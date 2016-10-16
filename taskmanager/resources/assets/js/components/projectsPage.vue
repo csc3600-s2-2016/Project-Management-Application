@@ -20,7 +20,9 @@
 			        <div class="col-md-4">
 			            <div class="panel panel-info">
 			                <div class="panel-heading">
-			                    {{panel.projectName}}
+			                	<a class="projectLinks" href="/tasks/{{parseInt(panel.projectId)}}" title="Go to tasks page">
+			                    {{panel.projectName}} <i class="fa fa-fw fa-arrow-circle-o-right" aria-hidden="true"></i>
+			                    </a>
 			                </div>
 			                <div class="panel-body">
 			                    <div class="col-md-4">
@@ -76,3 +78,12 @@
         }
     }
 </script>
+<style>
+.projectLinks{
+	color: #FFF;
+	font-weight: 400;
+}
+.projectLinks:hover{
+	color: #333;
+}
+</style>
