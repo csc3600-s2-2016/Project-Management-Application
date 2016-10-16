@@ -24,4 +24,5 @@ Route::get('/taskdata', 'taskController@getAll');
 
 Route::post('/taskdata', 'taskController@updateProject');
 
+Route::get('/review', 'reviewController@index');
 

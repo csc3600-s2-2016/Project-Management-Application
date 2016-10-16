@@ -1,0 +1,88 @@
+
+#menuWrapper{
+    z-index: 1;
+    position: absolute;
+    heights: 100%;
+    overflow-y: hidden;
+    opacity: 0.9;
+    width: 250px;
+}
+
+#menuBuffer{
+    padding-left:250px;
+}
+
+
+/* Report body */
+#bodyReport{
+    width: 100%;
+    position: absolute;
+    padding: 20px;
+    padding-left: 250px;
+}
+
+/* Display sidebar */
+#reviewWrapper.menuActive #menuWrapper{
+    width: 0px;
+}
+
+#reviewWrapper.menuActive #bodyReport{
+    padding-left: 10px;
+}
+
+#reviewWrapper.menuActive #menuBuffer{
+    padding-left: 10px;
+}
+
+.menuNavigation{
+    padding: 0;
+    list-style: none;   
+}
+
+.menuNavigation li{
+    text-indent: 20px;
+    line-height: 40px;  
+}
+
+.menuNavigation li a{
+    display: block;
+    text-decoration: none;
+}
+
+.menuNavigation li a:hover{
+    color: #16A085;
+}
+
+
+#projectSub.projectActivate li{
+    display: block;
+    text-indent: 20px;
+    line-height: 40px;  
+}
+
+
+#projectSub li{
+    display:none; 
+}
+
+#taskSub.taskActivate li{
+    display: block;
+    text-indent: 20px;
+    line-height: 40px;  
+}
+
+
+#taskSub li{
+    display:none; 
+}
+
+#userSub.userActivate li{
+    display: block;
+    text-indent: 20px;
+    line-height: 40px;  
+}
+
+
+#userSub li{
+    display:none; 
+}
