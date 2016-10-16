@@ -24,4 +24,7 @@ Route::get('/taskdata', 'taskController@getAll');
 
 Route::post('/taskdata', 'taskController@updateProject');
 
+Route::get('/profile', 'UserController@index');
+
+Route::get('/profile/getAll', 'UserController@getAll');
 
