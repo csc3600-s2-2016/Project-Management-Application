@@ -10,6 +10,7 @@
     <meta name="keywords" content="Project, Management, Software, Task, App">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet">
 
     <title>{{ config('app.name') }}</title>
     <link href="/css/app.css" rel="stylesheet"> 

@@ -12,7 +12,7 @@ var Bootstrap = require('bootstrap');
 var Material = require('bootstrap-material-design');
 global.toastr = require('toastr');
 var ReviewApp = require('./components/reviewApp.vue');
-var Chart = require('chart.js');
+global.Chart = require('chart.js');
 
 import TaskManagementApp from './components/taskManagementApp.vue';
 

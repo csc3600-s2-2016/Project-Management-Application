@@ -107,6 +107,7 @@ export default {
             var tempID = this.keyGenerator();
             newTask.status = 0;
             newTask.priority = 0;
+            newTask.completed = null;
             for (var id in this.tasks){
                 if (this.tasks[id].status === 0){
                     newTask.priority++;
@@ -133,12 +134,14 @@ export default {
                     }
                 }
 
+
                 //change task id to reflect database
                 var taskWithNewId = {};
                 var newId = jsonResponse.newID;
                 this.tasks[newId] = this.tasks[jsonResponse.tempID];
                 delete this.tasks[jsonResponse.tempID];
                 this.tasks = Object.assign({}, this.tasks);
+
 
                 
             }, (response) => {
@@ -203,13 +206,13 @@ export default {
             this.tasks = Object.assign({}, this.tasks);
         },
         'completeTask' : function(taskId){
-            this.tasks[taskId].completed = new Date();
+            this.tasks[taskId].completed = Object.assign(new Date());
             this.sendToServer({"updateType": "completeTask", "taskId": taskId, "completed": this.tasks[taskId].completed});
         }
     },
     ready: function() {
         this.currentUser = this.getCookie('uid');
-        var socket = io('http://taskmanager.site:3000');
+        var socket = io('http://192.168.33.10:3000');
 
 
         //load project from server
