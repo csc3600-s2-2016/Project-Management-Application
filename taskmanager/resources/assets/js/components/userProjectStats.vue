@@ -7,7 +7,9 @@
             <div class="least-content">15m</div>
             <h4 class="list-group-item-heading">{{username}}</h4>
 
-            <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus.</p>
+            <div class="list-group-item">
+
+            </div>
         </div>
     </div>
 </template>
@@ -19,8 +21,8 @@
             userId: {type: Number, default: 0}
         },
         data(){
-            return{
-            }
         },
+        created(){rue;
+        }
     }
 </script>
