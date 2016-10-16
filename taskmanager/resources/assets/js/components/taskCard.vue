@@ -13,6 +13,7 @@
     <div class="panel-heading task-summary">
         <div class=row>
             <div class='col-xs-10'>
+                <span v-show="task.completed !== null" class="fa fa-trophy fa-fw"> </span>
                 <span class="h4"> {{ task.name }} </span>
             </div>
             <div class='col-xs-2 text-right'>
@@ -25,14 +26,15 @@
                             <i class="fa fa-info-circle taskMenuIcon" aria-hidden="true"></i> Preview
                         </a>
                     </li>
-                    <li>
+                    <li v-show="task.completed === null">
                         <a v-on:click="openLogTimeModal">
                             <i class="fa fa-clock-o taskMenuIcon" aria-hidden="true"></i> Log Time
                         </a>
                     </li>
-                    <li v-show="!id.includes('TEMPORARY')"><a @click="editTask"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
+                    <li v-show="!id.includes('TEMPORARY') && task.completed === null"><a @click="editTask"><i class="fa fa-pencil taskMenuIcon" aria-hidden="true"></i> Edit</a></li>
 
                     <li v-show="!id.includes('TEMPORARY')" role="separator" class="divider"></li>
+                    <li v-show="!id.includes('TEMPORARY') && task.status == cols.length - 1 && task.completed === null"><a @click="completeTask"><i class="fa fa-trophy taskMenuIcon" aria-hidden="true"></i> Mark as Complete</a></li>
                     <li v-show="!id.includes('TEMPORARY')"><a @click="archiveTask"><i class="fa fa-archive taskMenuIcon" aria-hidden="true"></i> Archive</a></li>
                 </ul>
             </div>
@@ -161,6 +163,9 @@ export default {
         },
         archiveTask: function(){
             this.$dispatch('archiveTask', this.id);
+        },
+        completeTask: function(){
+            this.$dispatch('completeTask', this.id);
         }
     },
     components: {
