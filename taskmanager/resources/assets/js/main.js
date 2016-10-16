@@ -16,6 +16,7 @@ global.toastr = require('toastr');
 
 import TaskManagementApp from './components/taskManagementApp.vue';
 import UserProfileApp from './components/userProfileApp.vue';
+import ProjectManagerApp from './components/projectManagerApp.vue';
 
 Vue.use(Sortable);
 Vue.use(VDragableFor);
@@ -40,6 +41,7 @@ var taskApp = new Vue({
   },
   components: { 
   	taskManagementApp: TaskManagementApp,
-    userProfileApp: UserProfileApp
+    userProfileApp: UserProfileApp,
+    projectManagerApp: ProjectManagerApp
   }
 });

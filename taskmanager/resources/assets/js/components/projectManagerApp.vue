@@ -17,9 +17,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="list-group">
-                        <user-project-stats></user-project-stats>
-                        <user-project-stats></user-project-stats>
-                        <user-project-stats></user-project-stats>
+                        <user-project-stats v-for="userStats in allData.userProjectStats"></user-project-stats>
                     </div>
                 </div>
             </div>
@@ -132,19 +130,11 @@
 <style>
 </style>
 <script>
-    import UserProjectStats from '../../../../../../../../Desktop/components/userProjectStats.vue';
+    import UserProjectStats from 'userProjectStats.vue';
     export default{
-        props: {
-          name
-        },
         data(){
             return{
-                numTasks : 0,
-                openTasks: 0,
-                closedTasks: 0,
-                plannedEffort: 0,
-                expendedEffort: 0,
-                effortRemaining: 0
+                projectData : {}
             }
         },
         components:{
@@ -153,6 +143,10 @@
         methods: {
           projectName() {
               return "Project Name";
+          },
+          fetchAllData()
+          {
+
           }
         }
     }
