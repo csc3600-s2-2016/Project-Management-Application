@@ -217,7 +217,7 @@ export default {
             this.currentUser = (response.json().currentUser);
             toastr.success("Project loaded.");
         }, (response) =>{
-            toast.error("Error loading tasks from server!");
+            toastr.error("Error loading tasks from server!");
         });
        
 
