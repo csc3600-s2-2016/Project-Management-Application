@@ -16,8 +16,6 @@ Route::auth();
 
 Route::get('/', 'HomeController@index');
 
-Route::get('/projects', 'taskController@index');
-
 Route::get('/tasks', 'taskController@index' );
 
 Route::get('/taskdata', 'taskController@getAll');
@@ -31,4 +29,5 @@ Route::get('/projects', 'ProjectController@index');
 Route::get('/profile', 'UserController@index');
 Route::post('/profile', 'UserController@postData');
 Route::get('/profile/getAll', 'UserController@getAll');
-
+Route::get('/projects/{id}/archive', 'ProjectController@archive');
+Route::get('/projects/{id}/getAll', 'ProjectController@getAll');

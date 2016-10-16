@@ -1,10 +1,11 @@
 <template>
-<div class="container-fluid">
+<div class="container-fluid" v-if="loaded">
     <!-- Titles -->
     <div class="row">
 
         <div class="container">
-        <div class="row"><h2>Manage: {{projectName()}}</h2></div>
+        <div class="row"><h2>Manage: {{projectData.projectName}}</h2></div>
+        <div class="row" v-show="projectData.archived">This project is archived</div>
         </div>
     </div>
     <div class="row">
@@ -17,7 +18,13 @@
                 </div>
                 <div class="panel-body">
                     <div class="list-group">
-                        <user-project-stats v-for="userStats in allData.userProjectStats"></user-project-stats>
+                        <user-project-stats v-for="userStats in projectData.projectMembers"
+                                            :user-id="userStats.userid"
+                                            :username="userStats.username"
+                                            :created-tasks="userStats.tasksCreated"
+                        >
+
+                        </user-project-stats>
                     </div>
                 </div>
             </div>
@@ -41,7 +48,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="row">
-                                    {{numTasks}}
+                                        {{projectData.numTasks}}
                                     </div>
                                     <div class="row">
                                         Total Tasks
@@ -49,7 +56,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="row">
-                                        {{openTasks}}
+                                        {{projectData.openTasks}}
                                     </div>
                                     <div class="row">
                                         Tasks Open
@@ -57,7 +64,7 @@
                                 </div>
                                 <div class="col-sm-4 border-left">
                                     <div class="row">
-                                        {{closedTasks}}
+                                        {{projectData.numTasks - projectData.openTasks}}
                                     </div>
                                     <div class="row">
                                         Tasks Closed
@@ -66,7 +73,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="list-group-item">
+                    <div class="list-group-item" v-show="false">
                         <div class="row-action-primary">
                             <i class="material-icons">view_week</i>
                         </div>
@@ -75,7 +82,6 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="row">
-                                        {{plannedEffort}}
                                     </div>
                                     <div class="row">
                                         Planned Effort
@@ -83,7 +89,6 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="row">
-                                        {{expendedEffort}}
                                     </div>
                                     <div class="row">
                                         Expended Effort
@@ -91,7 +96,6 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="row">
-                                        {{effortRemaining}}
                                     </div>
                                     <div class="row">
                                         Effort Remaining
@@ -112,19 +116,22 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <button class="btn btn-danger">Change Project Manager</button>
-                        <select>
-                            <option>u1</option>
-                            <option>kyle lewer</option>
+                        <button class="btn btn-danger" v-on:click="changeProjectManager()">Change Project Manager</button>
+                        <select v-model="newManager">
+
+                            <option v-for="userStats in projectData.projectMembers" :value="userStats.userId">{{userStats.username}}</option>
                         </select>
                     </div>
                     <div class="row">
-                        <button class="btn btn-danger">Delete Project</button>
+                        <button class="btn btn-danger" v-on:click="archiveProject()">Archive Project</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+<div v-else>
+    <h1>Fetching Data</h1>
 </div>
 </template>
 <style>
@@ -132,9 +139,14 @@
 <script>
     import UserProjectStats from './userProjectStats.vue';
     export default{
+        props : {
+            projectId : {}
+        },
         data(){
             return{
-                projectData : {}
+                projectData : {},
+                loaded: false,
+                newManager: ""
             }
         },
         components:{
@@ -142,12 +154,34 @@
         },
         methods: {
           projectName() {
-              return "Project Name";
+              return "";
           },
-          fetchAllData()
+          changeProjectManager()
           {
+              alert("we are working on that!");
+          },
+          archiveProject()
+          {
+              this.$http.get('/projects/' + this.projectId + '/archive').then((response) =>
+              {
+                 alert("Project successfully archived. This project will no longer display on your projects page.")
+                 this.projectData.archived = true;
+              }, (response) => {
 
+              });
+          },
+          fetchAllData(){
+              this.$http.get('/projects/' + this.projectId + '/getAll').then((response)=>{
+                this.projectData = JSON.parse(response.data);
+              }, (response) =>{
+
+              });
           }
+        },
+        created()
+        {
+            this.fetchAllData();
+            this.loaded = true;
         }
     }
 </script>

@@ -52,6 +52,7 @@
               @endif
               ><a href="/review">Review</a></li>
               @endif
+              
             </ul>
       
             <ul class="nav navbar-nav navbar-right">
@@ -74,6 +75,7 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
+                                <li><a href="/projects/1"><i class="fa fa-btn fa-star"></i> Active Project</a></li>
                                 <li><a href="{{ url('/profile') }}"><i class="fa fa-btn fa-user"></i> My Profile</a></li>
                                 <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i> Logout</a></li>
                             </ul>

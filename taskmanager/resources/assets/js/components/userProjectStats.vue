@@ -4,10 +4,12 @@
             <i class="material-icons">account_box</i>
         </div>
         <div class="row-content">
-            <div class="least-content">15m</div>
+            <div class="least-content">UID: {{userId}}</div>
             <h4 class="list-group-item-heading">{{username}}</h4>
 
-            <p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus.</p>
+            <div class="list-group-item-text">This user has created {{createdTasks}} tasks.</div>
+
+            </div>
         </div>
     </div>
 </template>
@@ -16,11 +18,11 @@
 <script>
     export default{
         props : {
-            userId: {type: Number, default: 0}
+            userId: {type: Number, default: 0},
+            username: {},
+            createdTasks: {}
         },
         data(){
-            return{
-            }
-        },
+        }
     }
 </script>
