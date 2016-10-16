@@ -23,7 +23,11 @@ Route::get('/tasks', 'taskController@index' );
 Route::get('/taskdata', 'taskController@getAll');
 
 Route::post('/taskdata', 'taskController@updateProject');
-Route::get('/projects/{id}', 'ProjectController@index');
+
+Route::get('/projects/{id}', 'ProjectController@project');
+Route::get('/create-new-project', 'ProjectController@newProject');
+Route::post('/create-new-project', 'ProjectController@create');
+Route::get('/projects', 'ProjectController@index');
 Route::get('/profile', 'UserController@index');
 Route::post('/profile', 'UserController@postData');
 Route::get('/profile/getAll', 'UserController@getAll');

@@ -130,7 +130,7 @@
 <style>
 </style>
 <script>
-    import UserProjectStats from 'userProjectStats.vue';
+    import UserProjectStats from './userProjectStats.vue';
     export default{
         data(){
             return{

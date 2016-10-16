@@ -1,24 +1,8 @@
 <template>
-    <div v-if="loaded" class="container-fluid" >
+    <div v-if="loaded" class="container-fluid" style="margin-top:100px;" >
+        
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h1>Your Projects</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <project-status-panel
-                    v-for="panel in allData.userProjectInfo.projectOverviews" :project-id="parseInt(panel.projectId)"
-                    :project-name="panel.projectName"
-                    :current="parseFloat(panel.current)" :expected="parseFloat(panel.expected)"
-                    :members="parseFloat(panel.numMembers)" :can-manage="parseFloat(panel.canManage)">
-            </project-status-panel>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4 col-md-offset-1">
                 <div class="panel panel-primary">
                     <div class="panel-heading panel-primary">
                         <h1>Your Contributions</h1>
@@ -55,7 +39,6 @@
 </style>
 <script>
 
-    import ProjectStatusPanel from './projectStatusPanel.vue';
     import UserContributions from './userContributions.vue';
     import UserDetails from './userDetails.vue';
 
@@ -67,7 +50,6 @@
             }
         },
         components: {
-            projectStatusPanel: ProjectStatusPanel,
             userContributions: UserContributions,
             userDetails: UserDetails
         },

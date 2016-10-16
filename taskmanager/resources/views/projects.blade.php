@@ -1,4 +1,4 @@
 @extends('templates.layout')
 @section('content')
-    <project-manager-app></project-manager-app>
+<projects-page class="container" style="margin-top: 100px;"></projects-page>
 @stop
