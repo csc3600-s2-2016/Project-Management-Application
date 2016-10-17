@@ -217,7 +217,7 @@ export default {
     },
     ready: function() {
         this.currentUser = this.getCookie('uid');
-        var socket = io('http://192.168.33.10:3000');
+        var socket = io('http://taskmanager.site:3000');
 
 
         //load project from server
