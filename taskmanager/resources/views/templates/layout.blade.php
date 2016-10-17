@@ -78,7 +78,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li class="dropdown-header">Projects</li>
                                 @foreach ( Auth::user()->projects as $project  )
-                                    @if ($project->active == true)
+                                    @if ($project->active == true && $project->pivot->invite_accepted)
                                     <li><a href="/tasks/{{$project->id}}"><i class="fa fa-btn fa-star"></i> {{$project->name}}</a></li>
                                     @endif
                                 @endforeach

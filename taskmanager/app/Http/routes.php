@@ -27,6 +27,7 @@ Route::get('/projects/{id}', 'ProjectController@project');
 Route::get('/create-new-project', 'ProjectController@newProject');
 Route::post('/create-new-project', 'ProjectController@create');
 Route::post('/project/invite', 'ProjectController@invite');
+Route::post('/project/accept-invite', 'ProjectController@acceptInvite');
 Route::get('/projects', 'ProjectController@index');
 Route::get('/profile', 'UserController@index');
 Route::post('/profile', 'UserController@postData');

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Symfony\Component\Finder\Tests\Iterator\RealIteratorTestCase;
 use App\Project;
+use App\User;
 use Illuminate\Http\Response;
 
 
@@ -64,18 +65,28 @@ class ProjectController extends Controller
 
     }
 
-    public function invite($request){
-    	//todo: add userProject entry
+    public function invite(Request $request){
+    	if (! $this->authedUserIsMember($request->input("project"))){
+    		return response(403);
+    	}
+    	$userToInvite = User::where('email', $request->input('invite'))->first();
+    	$userToInvite->projects()->attach($request->input("project") );
+    	return response(200);
     }
-    public function acceptInvite($request){
-    	//todo: mark userProject entry as inite accepted
+    public function acceptInvite(Request $request){
+    	$id = $request->input("project");
+    	if (!$this->authedUserIsMemberOrInvited( $id )){
+    		return response(403);
+    	}
+    	Auth::user()->projects()->updateExistingPivot($request->input("project"), ["invite_accepted" => true]);
+    	return response(200);
     }
 
     public function getAll($id)
     {
         if(! $this->authedUserIsMember($id))
         {
-            return response()->setStatusCode(403);
+            return response(403);
         }
         $b = 2; //making stuff work
         $project = $this->getProject($id);
@@ -122,7 +133,25 @@ class ProjectController extends Controller
 
     private function authedUserIsMember($id)
     {
-        return Auth::user()->projects->contains($id);
+    	$project = Project::find($id);
+        $usersProjects = Auth::user()->projects;
+        foreach ($usersProjects as $usersProject) {
+            if($usersProject->id == $project->id && $usersProject->pivot->invite_accepted){
+                return true;
+            }
+        }
+        return false;
+    }
+    private function authedUserIsMemberOrInvited($id)
+    {
+    	$project = Project::find($id);
+        $usersProjects = Auth::user()->projects;
+        foreach ($usersProjects as $usersProject) {
+            if($usersProject->id == $project->id){
+                return true;
+            }
+        }
+        return false;
     }
     public function archive($id)
     {

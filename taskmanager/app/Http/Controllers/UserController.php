@@ -51,6 +51,12 @@ class UserController extends Controller
         $projectInfo->numProjects = $numProjects;
 
         $userData->userProjectInfo = $projectInfo;
+        $userData->pendingInvites = [];
+        foreach (Auth::user()->projects as $project){
+            if ( !$project->pivot->invite_accepted ){
+                array_push($userData->pendingInvites, [$project->id, $project->name]);
+            }
+        }
 
         //build project overviews
         $projectInfo->projectOverviews = \App\UsersProjects::where('user_id', $userModel->id)->get()
@@ -141,6 +147,7 @@ class UserProjectInfoJSON {
     public $numProjects;
     public $numHours;
     public $numTasks;
+    public $pendingInvites = [];
     public $projectOverviews = [];
 }
 class ProjectOverviewJSON {

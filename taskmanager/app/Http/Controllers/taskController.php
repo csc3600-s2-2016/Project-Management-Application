@@ -31,13 +31,21 @@ class taskController extends Controller
 
     public function setProject($id){
         $project = Project::find($id);
+        $usersProjects = Auth::user()->projects;
+        $userPermitted = false;
         if ($project == null){
             return response(404);
         }
         if (!Auth::check()){
             return view("login");
         }
-        if (! Auth::user()->projects->contains($id)){
+        foreach ($usersProjects as $usersProject) {
+            if($usersProject->id == $project->id && $usersProject->pivot->invite_accepted){
+                $userPermitted = true;
+                break;
+            }
+        }
+        if ( ! $userPermitted){
             return response(403);
         }
         session(["project" => $id]);

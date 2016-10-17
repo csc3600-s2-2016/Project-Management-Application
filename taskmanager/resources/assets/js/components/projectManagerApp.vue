@@ -230,7 +230,8 @@
           sendInvite() {
             var formData = new FormData();
             formData.append('invite', this.inviteEmail);
-            this.$http.post('/projects/invite', formData).then((response)=>{
+            formData.append('project', this.projectId);
+            this.$http.post('/project/invite', formData).then((response)=>{
                 alert("Invite Sent");
             }, (response) => {
 

@@ -30,14 +30,23 @@
 
             </div>
         </div>
-        <div class="row">
+        <div class="row" v-show="allData.pendingInvites.length > 0">
         <div class="col-md-4 col-md-offset-1">
             <div class="panel panel-primary">
                 <div class="panel-heading panel-primary">
                     <h3>Pending Invitations</h3>
                 </div>
                 <div class="panel-body">
-                Invite to blah <button class="btn btn-primary btn-raised">Accept</button>
+                <table>
+                    <tr v-for="invite in allData.pendingInvites">
+                        <td style="width:100%;">
+                            {{ invite[1] }}
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-raised" @click.prevent="acceptInvite(invite[0], $index)">Accept</button>
+                        </td>
+                    </tr>
+                </table>
                 </div>
             </div>
         </div>
@@ -72,6 +81,16 @@
                     this.allData = JSON.parse(response.data);
                     console.log('loaded data');
                     this.loaded = true;
+                }, (response) => {
+                    //failed
+                    console.log({"Failure": response});
+                });
+            },
+            acceptInvite(projectID, invitesIndex){
+                var data = new FormData();
+                data.append("project", projectID);
+                this.$http.post("/project/accept-invite", data).then((response)=>{
+                    this.allData.pendingInvites.splice(invitesIndex, 1);
                 }, (response) => {
                     //failed
                     console.log({"Failure": response});
