@@ -53,7 +53,7 @@
               ><a href="/review">Review</a></li>
               @endif
                 @if(! Auth::guest())
-                <li><a hre="/profile">Profile</a></li>
+                <li><a href="/profile">Profile</a></li>
                 @endif
                 @if(! Auth::guest())
                 <li><a href="/projects/1">Active Project</a></li>
