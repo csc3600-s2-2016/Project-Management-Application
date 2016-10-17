@@ -13,19 +13,21 @@
 use Illuminate\Support\Facades\Redis;
 
 Route::auth();
-
+// Requests to handle going to the / (landing page)
 Route::get('/', 'HomeController@index');
 
+// Requests to handle going to the tasks app
 Route::get('/projects', 'taskController@index');
-
 Route::get('/tasks', 'taskController@index' );
-
 Route::get('/taskdata', 'taskController@getAll');
-
 Route::post('/taskdata', 'taskController@updateProject');
+
+//Requests to handle going to the project management app
 Route::get('/projects/{id}', 'ProjectController@index');
+Route::get('/projects/{id}/archive', 'ProjectController@archive');
+Route::get('/projects/{id}/getAll', 'ProjectController@getAll');
+
+//Requests to handle going to the user profile app
 Route::get('/profile', 'UserController@index');
 Route::post('/profile', 'UserController@postData');
 Route::get('/profile/getAll', 'UserController@getAll');
-Route::get('/projects/{id}/archive', 'ProjectController@archive');
-Route::get('/projects/{id}/getAll', 'ProjectController@getAll');
