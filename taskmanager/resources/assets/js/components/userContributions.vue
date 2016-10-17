@@ -1,6 +1,6 @@
 <template>
-    <div class="row">
-        <div class="col-md-4">
+    <div class="row" v-show="ttlContributed > 0">
+        <div class="col-md-4" >
             <h4>Total Hours Contributed</h4>
             <div class="round-button">
                 <div class="round-button-circle">
@@ -24,6 +24,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
+        <h4 style="text-align:center;">You haven't participated in any projects yet!</h4>
     </div>
 </template>
 <style>

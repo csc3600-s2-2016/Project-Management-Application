@@ -116,9 +116,9 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <button class="btn btn-danger" v-on:click="changeProjectManager()">Change Project Manager</button>
+                        <button class="btn btn-danger" v-on:click="changeProjectManager()" title="change the manager to the one selected">Change Project Manager</button>
                         <select v-model="newManager">
-
+                            <option selected="seleceted">Select New Manager</option>
                             <option v-for="userStats in projectData.projectMembers" :value="userStats.userId">{{userStats.username}}</option>
                         </select>
                     </div>
@@ -158,7 +158,10 @@
           },
           changeProjectManager()
           {
-              alert("we are working on that!");
+              if(this.newManager !== "")
+              {
+                  alert("you must select a manager");
+              }
           },
           archiveProject()
           {
@@ -173,15 +176,18 @@
           fetchAllData(){
               this.$http.get('/projects/' + this.projectId + '/getAll').then((response)=>{
                 this.projectData = JSON.parse(response.data);
+                this.loaded = true;
               }, (response) =>{
-
+                if(confirm("Something went wrong loading project data. Sending you back to profile page."))
+                {
+                    window.location="/profile";
+                }
               });
           }
         },
         created()
         {
             this.fetchAllData();
-            this.loaded = true;
         }
     }
 </script>
