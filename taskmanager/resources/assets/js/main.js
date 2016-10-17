@@ -16,7 +16,9 @@ global.toastr = require('toastr');
 
 import TaskManagementApp from './components/taskManagementApp.vue';
 import UserProfileApp from './components/userProfileApp.vue';
-import ProjectManagerApp from './components/projectManagerApp.vue'
+import ProjectManagerApp from './components/projectManagerApp.vue';
+var ProjectsPage = require('./components/projectsPage.vue');
+
 
 Vue.use(Sortable);
 Vue.use(VDragableFor);
@@ -36,12 +38,13 @@ var taskApp = new Vue({
   ready: function(){
   	jQuery.material.init();
   	jQuery(function () {
-  		jQuery('[data-toggle="tooltip"]').tooltip()
+  		jQuery('[data-toggle="tooltip"]').tooltip();
 	});
   },
   components: { 
   	taskManagementApp: TaskManagementApp,
     userProfileApp: UserProfileApp,
-    projectManagerApp: ProjectManagerApp
+    projectManagerApp: ProjectManagerApp,
+    projectsPage: ProjectsPage
   }
 });
