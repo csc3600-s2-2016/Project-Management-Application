@@ -52,12 +52,6 @@
               @endif
               ><a href="/review">Review</a></li>
               @endif
-                @if(! Auth::guest())
-                <li><a href="/profile">Profile</a></li>
-                @endif
-                @if(! Auth::guest())
-                <li><a href="/projects/1">Active Project</a></li>
-                @endif
             </ul>
       
             <ul class="nav navbar-nav navbar-right">
