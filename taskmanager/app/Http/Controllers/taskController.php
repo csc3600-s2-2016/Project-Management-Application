@@ -90,6 +90,7 @@ class taskController extends Controller
     public function getAll(){
     	$projectData = new ProjectData();
         $project = Project::find(session("project"));
+        $projectData->projectName = $project->name;
         $projectData->currentUser = "u" . Auth::user()->id;
         $tasks = \App\Task::where([
             ['project', '=', $project->id],
@@ -201,6 +202,7 @@ class UserJSON{
 }
 
 class ProjectData {
+    public $projectName = "";
 	public $tasks = array();
 	public $users = array();
 	public $currentUser = "";

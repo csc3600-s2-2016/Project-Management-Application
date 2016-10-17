@@ -129,7 +129,7 @@ class UserController extends Controller
             $userModel->display_name = $newUsername;
             $userModel->save();
 
-            return response()->setStatusCode(200);
+            return response(200);
         }
 
         return response(500);

@@ -58,9 +58,9 @@ class ProjectController extends Controller
         $project->created_by = $user->id;
         $project->save();
 
-        $user->projects()->attach($project);
+        $user->projects()->attach($project, ['invite_accepted' => true]);
 
-        return view("projects");
+        return redirect()->action('ProjectController@index');
 
 
     }

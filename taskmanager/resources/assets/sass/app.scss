@@ -11,7 +11,9 @@
  
 // - - - - - - - - - - - - - - - - - - - - - - - - 
 
-
+.navbar-brand{
+  font-family: 'Lalezar';
+}
 body {
   background-color: $body-bg;
   &.inverse {

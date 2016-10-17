@@ -22,6 +22,7 @@
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        	<h1 class="review-project-name text-capitalize text-center"><small>Project:  </small>{{projectName}}</h1><br />
           <canvas v-el:canvas v-show="chart !== null" height="auto", width="auto"> </canvas>
           <div v-if="showOverview" class="row">
 				<div class="col-sm-4 text-center overview">
@@ -41,8 +42,8 @@
 
 
           <div v-show="showOverdueTasks">
-          	<h1> Overdue Tasks: </h1>
-          	<h3 v-show="overdueTasksData.length === 0">There are no overdue tasks <span class="fa fa-fw fa-thumbs-up"></span></h3>
+          	<h1 v-show="overdueTasksData.length > 0"> Overdue Tasks: </h1>
+          	<h3 v-show="overdueTasksData.length === 0" class="text-center" style="margin-top:30vh;">There are no overdue tasks <span class="fa fa-fw fa-thumbs-up"></span></h3>
           	<table v-show="overdueTasksData.length > 0" class="table">
           	<thead>
           		<tr>
@@ -113,6 +114,7 @@
 export default {
 	data() {
 		return {
+			projectName: "",
 			categories: [],
         	tasks: {},
             users: {},
@@ -140,7 +142,9 @@ export default {
     	//load project from server
     	var vm = this;
         this.$http.get('/taskdata').then((response) => {
+        	console.log(response.json());
             var tasks = this.processIncomingTasksData(response.json().tasks);
+            this.projectName = (response.json().projectName);
             this.tasks = Object.assign({}, this.tasks, tasks);
             this.categories = (response.json().categories);
             this.users = (response.json().users);
@@ -388,5 +392,8 @@ export default {
 }
 .overviewNumber {
 	font-size: 200px;
+}
+.review-project-name{
+	    font-family: 'Lalezar', cursive !important;
 }
 </style>

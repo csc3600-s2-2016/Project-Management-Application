@@ -79,7 +79,13 @@
                                 <li class="dropdown-header">Projects</li>
                                 @foreach ( Auth::user()->projects as $project  )
                                     @if ($project->active == true && $project->pivot->invite_accepted)
-                                    <li><a href="/tasks/{{$project->id}}"><i class="fa fa-btn fa-star"></i> {{$project->name}}</a></li>
+                                    <li><a href="/tasks/{{$project->id}}">
+
+                                        @if ($project->id == session("project"))
+                                        <i class="fa fa-btn fa-star"></i>
+                                        @endif
+
+                                     {{$project->name}}</a></li>
                                     @endif
                                 @endforeach
                                 <li role="separator" class="divider"></li>

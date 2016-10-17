@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col-md-4">
-            <h4>Total Hours Contributed</h4>
+            <h4 class="text-center">Total Hours Contributed</h4>
             <div class="round-button">
                 <div class="round-button-circle">
                     <span class="round-button"><strong>{{ttlContributed}}</strong></span>
@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <h4># Tasks Contributed To</h4>
+            <h4 class="text-center"># Tasks Contributed To</h4>
             <div class="round-button">
                 <div class="round-button-circle">
                     <span class="round-button"><strong>{{numContributed}}</strong></span>
@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <h4>Effort / Task Ratio</h4>
+            <h4 class="text-center">Effort / Task Ratio</h4>
             <div class="round-button">
                 <div class="round-button-circle">
                     <span class="round-button"><strong>{{ttlContributed/numContributed}}</strong></span>
@@ -27,9 +27,6 @@
     </div>
 </template>
 <style>
-    h4 {
-        text-align: center;
-    }
     .round-button {
         margin: 0px auto;
         width:6em;
